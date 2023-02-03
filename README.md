@@ -22,7 +22,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 ### 举个栗子
 
-我希望在[Cheshire-Nya/random-genshin-img仓库](https://github.com/Cheshire-Nya/random-genshin-img)下`纳西妲`文件夹下的35张图片中抽取，那么worker.js中：
+我希望在[Cheshire-Nya/random-genshin-img](https://github.com/Cheshire-Nya/random-genshin-img)仓库下`纳西妲`文件夹下的35张图片中抽取，那么worker.js中：
 
 [Line5](https://github.com/Cheshire-Nya/easy-random-img-api/blob/5fd71f5a549ab6e5ea8240a15891299bac9a89a2/worker.js#L5)就应该是`var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/random-genshin-img/main";`
 
