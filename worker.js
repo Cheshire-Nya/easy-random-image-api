@@ -11,12 +11,10 @@ var max;
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
   let imgPath = nowUrl.pathname;
-  //获取当前访问url的pathname
-  //pathname应当和图片文件夹一样
   
   if (imgPath == '/%E7%A4%BA%E4%BE%8B%E5%9B%BE') { max=10;} //示例图
-  //判断当前访问的url path是否为/示例图（即/%E7%A4%BA%E4%BE%8B%E5%9B%BE，js内中文不编码无法正常使用）
-  //是则返回max=4（即文件夹"荧"下的最大图片数）
+  //判断当前访问的url.pathname是否为/示例图（即/%E7%A4%BA%E4%BE%8B%E5%9B%BE，js内中文不编码无法正常使用）
+  //是则max=10（即文件夹"示例图"下图片命名数字最大一个）
   //其他路径下同理，只需要这样多写一次if即可
   if (imgPath == '/demoimg') { max=5;} //demoimg
   //英文路径正常使用
