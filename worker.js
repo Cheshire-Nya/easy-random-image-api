@@ -32,7 +32,7 @@ async function handle1(nowUrl) {
   let urlSearch = nowUrl.search
   let wholePath = nowUrl.pathname;
   if (urlSearch) {
-    const regex = /^\/api\/(\S+)$/;
+    const regex = /^\/api\/(.+[^\/])\/$/;
     const match = wholePath.match(regex);
     if (match) {
       imgPath = `/${match[1]}`;
@@ -56,7 +56,7 @@ async function handle1(nowUrl) {
 function handle2(wholePath) {
   let imgPath = null;
   let imgName = null;
-  const regex1 = /^\/api\/(\S+)\/(\d+)\.jpg$/;
+  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/;
   const match1 = wholePath.match(regex1);
 
   if (match1) { 
@@ -70,7 +70,7 @@ function handle2(wholePath) {
       },
     });
   } else {
-    const regex2 = /^\/api\/(\S+)$/;
+    const regex2 = /^\/api\/(.+[^\/])\/?$/;
     const match2 = wholePath.match(regex2);
 
     if (match2) { 
