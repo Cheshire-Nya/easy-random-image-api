@@ -20,7 +20,7 @@ var maxValues = {
 
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
-  if (nowUrl.pathname == '/api' || '/api/') {
+  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
     return random('/');
   } else {
     return handle1(nowUrl);
