@@ -41,7 +41,8 @@ async function handle1(nowUrl) {
       const imgUrl = imgHost + imgPath + '/' + imgName + '.jpg'
       return fetch(new Request(imgUrl), {
         headers: {
-        'content-type': 'image/jpeg'
+          'cache-control': 'no-store',
+		  'content-type': 'image/jpeg'
         },
       });
     }
@@ -64,7 +65,8 @@ function handle2(wholePath) {
     let imgUrl = imgHost + imgPath + "/" + imgName + ".jpg";
     return fetch(new Request(imgUrl), {
       headers: {
-      'content-type': 'image/jpeg'
+        'cache-control': 'no-store',
+		'content-type': 'image/jpeg'
       },
     });
   } else {
@@ -89,7 +91,8 @@ function random(imgPath) {
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
     headers: {
-      'content-type': 'image/jpeg'
+      'cache-control': 'no-store',
+	  'content-type': 'image/jpeg'
     },
   });  
 }
