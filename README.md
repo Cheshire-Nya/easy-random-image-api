@@ -14,7 +14,7 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 
 ## 部署和使用
 
-Github随便新建个公开仓库，图片按`1.jpg，2.jpg，3.jpg`这样重命名后塞进库里，分不分文件夹都行
+Github随便新建个公开仓库，图片按`1.jpg，2.jpg，3.jpg`这样重命名后塞进库里，分不分文件夹都能用
 
 Cloudflare Worker首页：https://workers.cloudflare.com
 
@@ -41,3 +41,13 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 2.cloudflare注册没有花里胡哨的各种认证，门槛极低，有邮箱就能注册。
 
 3.理论上可以无限白嫖，多注册几个账号，其他服务调用随机图时多写个逻辑返回错误请求另外的接口即可。唯一的成本无非就是大陆访问需要绑自定义域名，但是域名无论是白嫖免费域名或是一年十几二十块的便宜域名，四舍五入就是没花钱欸嘿。添加自定义域在[Cloudflare控制台](https://dash.cloudflare.com/)中`网站`里按指引操作，选择free计划即可。
+
+## TODO（咕咕咕）
+
+- [ ] 1.支持查看指定图片
+
+- [ ] 2.支持返回json
+
+- [ ] 3.添加一个主页模板
+
+- [ ] 4.添加404模板
