@@ -10,18 +10,66 @@ var max;
 
 var maxValues = {
   '/%E7%A4%BA%E4%BE%8B%E5%9B%BE': 10, //示例图
-  //判断当前访问的url.pathname是否为/示例图（即/%E7%A4%BA%E4%BE%8B%E5%9B%BE，js内中文不编码无法正常使用）
-  //是则max=10（即文件夹"示例图"下图片命名数字最大一个）
+  //用于后面判断当前访问的pathname是否为`/示例图`（即`/%E7%A4%BA%E4%BE%8B%E5%9B%BE`，js内中文不编码无法正常使用）
   //其他路径下同理，只需要这样相同格式多写一条键值对即可`'/<文件夹名>': <数值>,`
   '/demoimg': 5, //demoimg
   //英文路径正常使用
 }
-//存储仓库下图片文件夹名称及对应的图片数
+//存储键值对：仓库下图片文件夹名称及对应的图片数
 
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
-  let imgPath = nowUrl.pathname;
-  
+  let urlSearch = nowUrl.search
+  let wholePath = nowUrl.pathname;
+  if (urlSearch) {
+    const regex = /^\/api\/(\S+)$/;
+    const match = wholePath.match(regex);
+    if (match) { 
+      imgPath = `/${match[1]}`;
+      const params = new URLSearchParams(urlSearch);
+      const imgName = parseInt(params.get("id")); 
+      const imgUrl = imgHost + imgPath + '/' + imgName + '.jpg'
+      return fetch(new Request(imgUrl), {
+        headers: {
+        'content-type': 'image/jpeg'
+        },
+      });
+    }
+
+  } else {
+    return handle2(nowUrl, wholePath);
+  }
+}
+
+async function handle2(nowUrl, wholePath) {
+  let imgPath = null;
+  let imgName = null;
+  const regex1 = /^\/api\/(\S+)\/(\d+)\.jpg$/;
+  const match1 = wholePath.match(regex1);
+
+  if (match1) { 
+    imgPath = `/${match1[1]}`;
+    imgName = match1[2];
+    let imgUrl = imgHost + imgPath + "/" + imgName + ".jpg";
+    return fetch(new Request(imgUrl), {
+      headers: {
+      'content-type': 'image/jpeg'
+      },
+    });
+  } else {
+    const regex2 = /^\/api\/(\S+)$/;
+    const match2 = wholePath.match(regex2);
+
+    if (match2) { 
+      imgPath = `/${match2[1]}`;
+      return random(imgPath);
+    } /*else { // 如果匹配不成功
+      return fetch(request); // 直接返回fetch(404.html)结果
+    }*/
+  }
+}
+
+function random(imgPath) {
   let max = maxValues[imgPath];
 
   let imgUrl = imgHost + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
