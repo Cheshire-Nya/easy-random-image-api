@@ -50,10 +50,22 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 ## TODO（咕咕咕）
 
-- [x] 1.支持查看指定图片
+- [x] 支持查看指定图片
 
-- [ ] 2.支持返回json
+- [ ] 支持返回json
 
-- [ ] 3.添加一个主页模板
+- [ ] 添加一个主页模板
 
-- [ ] 4.添加404模板
+- [ ] 添加404模板
+
+- [ ] 解决`/api?`和`/api/?`无法使用
+
+- [ ] 解决`/api/1.jpg`无法使用
+
+- [ ] 解决`/api/demoimg?`无法使用
+
+## 其他版本（咕咕咕）
+
+- [x] 极简简简版（留当纪念的第一版捏）
+
+- [ ] 自行存入指定图片链接的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）
