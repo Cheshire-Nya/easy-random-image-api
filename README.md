@@ -56,7 +56,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 - [ ] 3.添加一个主页模板
 
-- [ ] 4.添加404模板
+- [x] 4.添加404模板
 
 - [x] 5.解决`/api?`和`/api/?`无法使用
 
@@ -73,6 +73,8 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 - [ ] 自行存入指定图片链接的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）
 
 ## changelog
+
+- 2023.02.02 完成TODO4
 
 - 2023.02.05 完成TODO1,5,6,7
 
