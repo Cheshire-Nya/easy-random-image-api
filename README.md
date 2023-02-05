@@ -66,6 +66,6 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 ## 其他版本（咕咕咕）
 
-- [x] 极简简简版（留当纪念的第一版捏）
+- [x] 极简简简版（留档纪念的第一版捏）
 
 - [ ] 自行存入指定图片链接的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）
