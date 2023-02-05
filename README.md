@@ -74,7 +74,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 ## changelog
 
-- 2023.02.05 完成TODO1,5,6
+- 2023.02.05 完成TODO1,5,6,7
 
 - 2023.02.04 更完善的版本，自定义默认目录
 
