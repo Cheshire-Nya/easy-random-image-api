@@ -50,21 +50,21 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 ## TODO（咕咕咕）
 
-- [x] 支持查看指定图片
+- [x] 1.支持查看指定图片
 
-- [ ] 支持返回json
+- [ ] 2.支持返回json
 
-- [ ] 添加一个主页模板
+- [ ] 3.添加一个主页模板
 
-- [ ] 添加404模板
+- [ ] 4.添加404模板
 
-- [x] 解决`/api?`和`/api/?`无法使用
+- [x] 5.解决`/api?`和`/api/?`无法使用
 
-- [ ] 解决`/api/1.jpg`无法使用
+- [ ] 6.解决`/api/1.jpg`无法使用
 
-- [ ] 解决`/api/demoimg?`无法使用
+- [ ] 7.解决`/api/demoimg?`无法使用
 
-- [ ] 
+- [ ] 8.支持返回302到通过ghproxy或worker代理的图片地址，方便web使用不受浏览器缓存影响
 
 ## 其他版本（咕咕咕）
 
@@ -73,3 +73,9 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 - [ ] 自行存入指定图片链接的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）
 
 ## changelog
+
+- 2023.02.05 解决Todo1,5
+
+- 2023.02.04 更完善的版本，自定义默认目录
+
+- 2023.02.03 初始极简版，简简单单抽个图
