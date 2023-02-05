@@ -2,11 +2,15 @@ addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
 
+var min = 1;
+var max;
+
 var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-img-api/main";
 //图片地址前部不会发生改变的部分
 //用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>"
-var min = 1;
-var max;
+
+var defaultPath = '/'; //现在是仓库根目录
+//访问的url路径为`/api`或`/api/`时抽图的文件夹
 
 var maxValues = {
   '/': 2, //仓库根目录
@@ -20,64 +24,58 @@ var maxValues = {
 
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
-  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
-    return random('/');
+  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') { //是/api或/api/
+    if (nowUrl.search) { //则检查是否有查询字符串
+      const params = new URLSearchParams(nowUrl.search);
+      const imgName = parseInt(params.get("id")); //有则提取`id`的值赋给imgName
+      return prescriptive(defaultPath, imgName);
+    } else {
+      return random(defaultPath); //没有查询则转到random，传递默认目录
+    };
   } else {
     return handle1(nowUrl);
   }
 }
 
 
-async function handle1(nowUrl) {
+function handle1(nowUrl) {
   let urlSearch = nowUrl.search
   let wholePath = nowUrl.pathname;
-  if (urlSearch) {
-    const regex = /^\/api\/(.+[^\/])\/$/;
-    const match = wholePath.match(regex);
-    if (match) {
-      imgPath = `/${match[1]}`;
+  if (urlSearch) { //如果有查询字符串，将拿到的imgPath和imgName传给prescriptive
+    const regex = /^\/api\/(.+[^\/])\/$/; // 正则表达式，匹配以/api/开头，后面是任意字符组成的字符串的字符串
+    const match = wholePath.match(regex); // 匹配pathname字符串
+    if (match) { // 如果匹配成功
+      imgPath = `/${match[1]}`; // 将匹配的第一个组（任意字符组成的字符串）加上/符号，并赋值给pathname
       const params = new URLSearchParams(urlSearch);
       const imgName = parseInt(params.get("id")); 
-      const imgUrl = imgHost + imgPath + '/' + imgName + '.jpg'
-      return fetch(new Request(imgUrl), {
-        headers: {
-          'cache-control': 'no-store',
-		  'content-type': 'image/jpeg'
-        },
-      });
+      return prescriptive(imgPath, imgName);
     }
 
-  } else {
+  } else { //没有查询则转到handle2
     return handle2(wholePath);
   }
 }
 
 
 function handle2(wholePath) {
-  let imgPath = null;
-  let imgName = null;
-  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/;
-  const match1 = wholePath.match(regex1);
+  let imgPath = null; // 声明变量imgPath，初始值为null
+  let imgName = null; // 声明变量imgName，初始值为null
+  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/; // 正则表达式，匹配以/api/开头，后面是任意非空字符组成的字符串，再加上一个/，后面是阿拉伯数字组成的字符串，最后是.jpg结尾的字符串
+  const match1 = wholePath.match(regex1); // 匹配pathname字符串
 
-  if (match1) { 
-    imgPath = `/${match1[1]}`;
-    imgName = match1[2];
-    let imgUrl = imgHost + imgPath + "/" + imgName + ".jpg";
-    return fetch(new Request(imgUrl), {
-      headers: {
-        'cache-control': 'no-store',
-		'content-type': 'image/jpeg'
-      },
-    });
+  if (match1) { // 如果匹配成功
+    imgPath = `/${match1[1]}`; // 将匹配的第一个组（任意字符组成的字符串）加上/符号，并赋值给imgPath
+    imgName = match1[2]; // 将匹配的第二个组（阿拉伯数字组成的字符串）赋值给imgName
+    return prescriptive(imgPath, imgName);
   } else {
-    const regex2 = /^\/api\/(.+[^\/])\/?$/;
-    const match2 = wholePath.match(regex2);
+    const regex2 = /^\/api\/(.+[^\/])\/?$/; // 正则表达式，匹配以/api/开头，后面是任意字符组成的字符串的字符串
+    const match2 = wholePath.match(regex2); // 匹配pathname字符串
 
-    if (match2) { 
-      imgPath = `/${match2[1]}`;
+    if (match2) { // 如果匹配成功
+      imgPath = `/${match2[1]}`; // 将匹配的第一个组（任意字符组成的字符串）加上/符号，并赋值给imgPath
       return random(imgPath);
-    } /*else { 
-      return fetch(request);
+    } /*else { // 如果匹配不成功
+      return fetch(request); // 直接返回fetch(404.html)结果
     }*/
   }
 }
@@ -91,8 +89,22 @@ function random(imgPath) {
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
     headers: {
-      'cache-control': 'no-store',
-	  'content-type': 'image/jpeg'
+      'cache-control': 'max-age=0, s-maxage=0',
+      'content-type': 'image/jpeg',
+      'Cloudflare-CDN-Cache-Control': 'max-age=0',
+      'CDN-Cache-Control': 'max-age=0'
     },
   });  
+}
+
+function prescriptive(imgPath, imgName) {
+  let imgUrl = imgHost + imgPath + "/" + imgName + ".jpg";
+    return fetch(new Request(imgUrl), {
+      headers: {
+        'cache-control': 'max-age=0, s-maxage=0',
+        'content-type': 'image/jpeg',
+        'Cloudflare-CDN-Cache-Control': 'max-age=0',
+        'CDN-Cache-Control': 'max-age=0'
+      },
+    });
 }
