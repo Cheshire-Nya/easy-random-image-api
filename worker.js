@@ -24,28 +24,43 @@ var maxValues = {
 
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
-  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') { 
-    if (nowUrl.search) { 
+  let wholePath = nowUrl.pathname;
+  let urlSearch = nowUrl.search;
+  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
+    if (nowUrl.search) {
       const params = new URLSearchParams(nowUrl.search);
-      const imgName = parseInt(params.get("id")); 
+      const imgName = parseInt(params.get("id"));
       return prescriptive(defaultPath, imgName);
     } else {
-      return random(defaultPath); 
+      return random(defaultPath);
     };
   } else {
-    return handle1(nowUrl);
+    return whetherDefault(wholePath, urlSearch);
   }
 }
 
 
-function handle1(nowUrl) {
-  let urlSearch = nowUrl.search
-  let wholePath = nowUrl.pathname;
-  if (urlSearch) { 
-    const regex = /^\/api\/(.+[^\/])\/$/; 
-    const match = wholePath.match(regex); 
+function whetherDefault(wholePath, urlSearch) {
+  let imgName = null;
+  const regex = /^\/api\/(\d+)\.jpg$/;
+  const match = wholePath.match(regex);
+  if (match) {
+    imgName = match[1];
+    let imgPath = defaultPath;
+    return prescriptive(defaultPath, imgName);
+  } else {
+    return handle1(wholePath, urlSearch);
+  }
+}
+
+
+function handle1(wholePath, urlSearch) {
+  let imgPath = null;
+  if (urlSearch) {
+    const regex = /^\/api\/(.+[^\/])\/$/;
+    const match = wholePath.match(regex);
     if (match) { 
-      imgPath = `/${match[1]}`; 
+      imgPath = `/${match[1]}`;
       const params = new URLSearchParams(urlSearch);
       const imgName = parseInt(params.get("id")); 
       return prescriptive(imgPath, imgName);
@@ -58,20 +73,20 @@ function handle1(nowUrl) {
 
 
 function handle2(wholePath) {
-  let imgPath = null; 
-  let imgName = null; 
-  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/; 
+  let imgPath = null;
+  let imgName = null;
+  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/;
   const match1 = wholePath.match(regex1);
 
   if (match1) { 
-    imgPath = `/${match1[1]}`; 
+    imgPath = `/${match1[1]}`;
     imgName = match1[2];
     return prescriptive(imgPath, imgName);
   } else {
     const regex2 = /^\/api\/(.+[^\/])\/?$/;
-    const match2 = wholePath.match(regex2); 
+    const match2 = wholePath.match(regex2);
 
-    if (match2) { 
+    if (match2) {
       imgPath = `/${match2[1]}`;
       return random(imgPath);
     } /*else { // 如果匹配不成功
