@@ -24,13 +24,13 @@ var maxValues = {
 
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
-  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') { //是/api或/api/
-    if (nowUrl.search) { //则检查是否有查询字符串
+  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') { 
+    if (nowUrl.search) { 
       const params = new URLSearchParams(nowUrl.search);
-      const imgName = parseInt(params.get("id")); //有则提取`id`的值赋给imgName
+      const imgName = parseInt(params.get("id")); 
       return prescriptive(defaultPath, imgName);
     } else {
-      return random(defaultPath); //没有查询则转到random，传递默认目录
+      return random(defaultPath); 
     };
   } else {
     return handle1(nowUrl);
@@ -41,38 +41,38 @@ async function handleRequest(request) {
 function handle1(nowUrl) {
   let urlSearch = nowUrl.search
   let wholePath = nowUrl.pathname;
-  if (urlSearch) { //如果有查询字符串，将拿到的imgPath和imgName传给prescriptive
-    const regex = /^\/api\/(.+[^\/])\/$/; // 正则表达式，匹配以/api/开头，后面是任意字符组成的字符串的字符串
-    const match = wholePath.match(regex); // 匹配pathname字符串
-    if (match) { // 如果匹配成功
-      imgPath = `/${match[1]}`; // 将匹配的第一个组（任意字符组成的字符串）加上/符号，并赋值给pathname
+  if (urlSearch) { 
+    const regex = /^\/api\/(.+[^\/])\/$/; 
+    const match = wholePath.match(regex); 
+    if (match) { 
+      imgPath = `/${match[1]}`; 
       const params = new URLSearchParams(urlSearch);
       const imgName = parseInt(params.get("id")); 
       return prescriptive(imgPath, imgName);
     }
 
-  } else { //没有查询则转到handle2
+  } else { 
     return handle2(wholePath);
   }
 }
 
 
 function handle2(wholePath) {
-  let imgPath = null; // 声明变量imgPath，初始值为null
-  let imgName = null; // 声明变量imgName，初始值为null
-  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/; // 正则表达式，匹配以/api/开头，后面是任意非空字符组成的字符串，再加上一个/，后面是阿拉伯数字组成的字符串，最后是.jpg结尾的字符串
-  const match1 = wholePath.match(regex1); // 匹配pathname字符串
+  let imgPath = null; 
+  let imgName = null; 
+  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/; 
+  const match1 = wholePath.match(regex1);
 
-  if (match1) { // 如果匹配成功
-    imgPath = `/${match1[1]}`; // 将匹配的第一个组（任意字符组成的字符串）加上/符号，并赋值给imgPath
-    imgName = match1[2]; // 将匹配的第二个组（阿拉伯数字组成的字符串）赋值给imgName
+  if (match1) { 
+    imgPath = `/${match1[1]}`; 
+    imgName = match1[2];
     return prescriptive(imgPath, imgName);
   } else {
-    const regex2 = /^\/api\/(.+[^\/])\/?$/; // 正则表达式，匹配以/api/开头，后面是任意字符组成的字符串的字符串
-    const match2 = wholePath.match(regex2); // 匹配pathname字符串
+    const regex2 = /^\/api\/(.+[^\/])\/?$/;
+    const match2 = wholePath.match(regex2); 
 
-    if (match2) { // 如果匹配成功
-      imgPath = `/${match2[1]}`; // 将匹配的第一个组（任意字符组成的字符串）加上/符号，并赋值给imgPath
+    if (match2) { 
+      imgPath = `/${match2[1]}`;
       return random(imgPath);
     } /*else { // 如果匹配不成功
       return fetch(request); // 直接返回fetch(404.html)结果
