@@ -62,7 +62,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 - [x] 6.解决`/api/1.jpg`无法使用
 
-- [ ] 7.解决`/api/demoimg?`无法使用
+- [x] 7.解决`/api/demoimg?`无法使用
 
 - [ ] 8.支持返回302到通过ghproxy或worker代理的图片地址，方便web使用不受浏览器缓存影响
 

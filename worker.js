@@ -57,7 +57,7 @@ function whetherDefault(wholePath, urlSearch) {
 function handle1(wholePath, urlSearch) {
   let imgPath = null;
   if (urlSearch) {
-    const regex = /^\/api\/(.+[^\/])\/$/;
+    const regex = /^\/api\/(.+[^\/])\/?$/;
     const match = wholePath.match(regex);
     if (match) { 
       imgPath = `/${match[1]}`;
