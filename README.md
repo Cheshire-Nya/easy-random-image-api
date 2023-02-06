@@ -16,6 +16,8 @@
 
 [https://demo1.randomimg.sfacg.ltd/api/demoimg/2.jpg](https://demo1.randomimg.sfacg.ltd/api/demoimg/2.jpg)查看`demoimg`下的`2.jpg`
 
+[https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302](https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302)以302返回跳转到随机一张图固定的地址，供网页使用
+
 PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演示站是添加的自定义域名
 
 ## 部署和使用
@@ -29,6 +31,29 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 进入编辑后复制 [worker.js](https://github.com/Cheshire-Nya/easy-random-img-api/blob/main/worker.js)  到左侧代码框，**按照代码中的注释和自己的需求修改代码**，`保存并部署`。
 
 如果分了文件夹，想抽文件夹下的图片就得访问`https://<worker域名>/api/<文件夹名>`，抽取直接存仓库根目录的图片访问`https://<worker域名>/api`
+
+### 需要修改的变量
+
+#### 必选
+
+`url404`：404页的地址
+
+`imgHost`：图片仓库的地址，通常为此格式`https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>`
+
+`defaultPath`：当访问的url为`https://example.com/api`时抽取图片的文件夹，你可以当成默认分类
+
+`maxValues`：用来抽图的文件夹名称和对应的图片数，以键值对形式存储，格式为`'/<名称>': <数量>,`
+
+#### 可选
+
+`redirectProxy`：返回类型为302时图片使用的代理，默认为`2`。`0`不使用代理（返回github原地址），`1`(不推荐)使用worker本身代理（返回`https://example.com/api/1.jpg`这样的链接），`2`(推荐)使用ghproxy代理（返回`ghproxy.com`代理的链接）  
+PS：如果302返回使用的是worker代理，那么相当于调用一次请求了worker两次，故不推荐
+
+`ghproxyUrl`：github加速站的链接，`ghproxy.com`能正常使用就不需要改，更换地址通常按照此格式填写`"https://example.com/"`（不能漏掉结尾的`/`）
+
+### 调用参数
+
+
 <!--
 ### 举个栗子
 
@@ -64,7 +89,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 - [x] 7.解决`/api/demoimg?`无法使用
 
-- [ ] 8.支持返回302到通过ghproxy或worker代理的图片地址，方便web使用不受浏览器缓存影响
+- [x] 8.支持返回302到通过ghproxy或worker代理的图片地址，方便web使用不受浏览器缓存影响
 
 ## 其他版本（咕咕咕）
 
@@ -74,9 +99,9 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 ## changelog
 
-- 2023.02.06 完成TODO4，完善错误返回
+- 2023.02.06 完成TODO4、8，完善错误返回
 
-- 2023.02.05 完成TODO1,5,6,7
+- 2023.02.05 完成TODO1、5、6、7
 
 - 2023.02.04 更完善的版本，自定义默认目录
 

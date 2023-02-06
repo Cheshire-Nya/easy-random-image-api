@@ -2,17 +2,18 @@ addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
 
-var min = 1;
-var max;
-
-var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-img-api/main/html-template/404.html";
+var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/404.html";
 //404模板地址
-var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-img-api/main";
+
+var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main";
 //图片地址前部不会发生改变的部分
 //用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>"
 
 var defaultPath = '/'; //现在是仓库根目录
 //访问的url路径为`/api`或`/api/`时抽图的文件夹
+
+var redirectProxy = 2;
+//type=302时返回的链接是否是经过代理的，0 不代理(返回github原链接)，1 worker代理，2 ghproxy代理
 
 var maxValues = {
   '/': 2, //仓库根目录
@@ -24,29 +25,31 @@ var maxValues = {
 }
 //存储键值对：仓库下图片文件夹名称及对应的图片数
 
+var ghproxyUrl = "https://ghproxy.com/";
+var min = 1;
+var max;
 
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
   let wholePath = nowUrl.pathname;
   let urlSearch = nowUrl.search;
-  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') { 
-    if (nowUrl.search) { 
-      const params = new URLSearchParams(nowUrl.search);
-      const imgName = parseInt(params.get("id"));
-      return prescriptive(defaultPath, imgName)
+  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
+    if (nowUrl.search) {
+      const imgPath = defaultPath;
+      return extractSearch(imgPath, urlSearch, request);
 
     } else {
      return random(defaultPath);
 
     };
   } else {
-    return whetherDefault(wholePath, urlSearch);
+    return whetherDefault(wholePath, urlSearch, request);
 
   }
 }
 
 
-function whetherDefault(wholePath, urlSearch) {
+function whetherDefault(wholePath, urlSearch, request) {
   let imgName = null;
   const regex = /^\/api\/(\d+)\.jpg$/;
   const match = wholePath.match(regex);
@@ -55,48 +58,59 @@ function whetherDefault(wholePath, urlSearch) {
     let imgPath = defaultPath;
     return prescriptive(defaultPath, imgName);
   } else {
-    return handle1(wholePath, urlSearch);
+    return handle1(wholePath, urlSearch, request);
   }
 }
 
 
-function handle1(wholePath, urlSearch) {
+function handle1(wholePath, urlSearch, request) {
   let imgPath = null;
-  if (urlSearch) { 
+  if (urlSearch) {
     const regex = /^\/api\/(.+[^\/])\/?$/;
     const match = wholePath.match(regex);
-    if (match) { 
+    if (match) {
       imgPath = `/${match[1]}`;
-      const params = new URLSearchParams(urlSearch);
-      const imgName = parseInt(params.get("id")); 
-      return prescriptive(imgPath, imgName);
-    }
+      return extractSearch(imgPath, urlSearch, request);
+    } else {
+      return error();
+    };
 
-  } else { 
+  } else {
     return handle2(wholePath);
-  }
+  };
 }
 
+function extractSearch(imgPath, urlSearch, request) {
+  const params = new URLSearchParams(urlSearch);
+  if (params.has("id") && params.get("type") !== "302") {
+    const imgName = parseInt(params.get("id"));
+    return prescriptive(imgPath, imgName);
+  
+  } else if (params.get("type") === "302") {
+    
+    return redirect(imgPath, request);
+  }
+}
 
 function handle2(wholePath) {
   let imgPath = null;
   let imgName = null;
-  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/; 
-  const match1 = wholePath.match(regex1); 
+  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/;
+  const match1 = wholePath.match(regex1);
 
   if (match1) { 
-    imgPath = `/${match1[1]}`; 
+    imgPath = `/${match1[1]}`;
     imgName = match1[2];
     return prescriptive(imgPath, imgName);
   } else {
-    const regex2 = /^\/api\/(.+[^\/])\/?$/; 
+    const regex2 = /^\/api\/(.+[^\/])\/?$/;
     const match2 = wholePath.match(regex2);
 
-    if (match2) { 
+    if (match2) {
       imgPath = `/${match2[1]}`;
       return random(imgPath);
-    } else { 
-      return error(); 
+    } else {
+      return error();
     }
   }
 }
@@ -106,7 +120,7 @@ function random(imgPath) {
   if (!maxValues.hasOwnProperty(imgPath)) { 
   return error();
   }
-  let max = maxValues[imgPath]; 
+  let max = maxValues[imgPath];
   let imgUrl = imgHost + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
@@ -133,6 +147,42 @@ function prescriptive(imgPath, imgName) {
       });
     } else return error();
   } else return error();
+}
+
+function redirect(imgPath, request) {
+  let max = maxValues[imgPath];
+  if (redirectProxy === 0) {
+    const redirectUrl = imgHost + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
+    return do302(redirectUrl);
+
+  } else if (redirectProxy === 1) {
+    const nowUrl = new URL(request.url);
+    const myHost = nowUrl.hostname;
+    if (imgPath === defaultPath) {
+      const redirectUrl = "https://" + myHost + "/api/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
+      return do302(redirectUrl);
+
+    } else if (maxValues.hasOwnProperty(imgPath) && imgPath !== defaultPath) {
+      const redirectUrl = "https://" + myHost + "/api" + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
+      return do302(redirectUrl);
+
+    } else return error();
+  
+  } else if (redirectProxy === 2) {
+    const redirectUrl = ghproxyUrl + imgHost + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
+    return do302(redirectUrl);
+
+  } else return error();
+  
+}
+
+function do302(redirectUrl) {
+  return new Response("", {
+    status: 302,
+    headers: {
+      Location: redirectUrl
+    }
+  });
 }
 
 async function error() {
