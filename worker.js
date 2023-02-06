@@ -5,6 +5,8 @@ addEventListener('fetch', event => {
 var min = 1;
 var max;
 
+var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-img-api/main/html-template/404.html";
+//404模板地址
 var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-img-api/main";
 //图片地址前部不会发生改变的部分
 //用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>"
@@ -22,20 +24,24 @@ var maxValues = {
 }
 //存储键值对：仓库下图片文件夹名称及对应的图片数
 
+
 async function handleRequest(request) {
   let nowUrl = new URL(request.url);
   let wholePath = nowUrl.pathname;
   let urlSearch = nowUrl.search;
-  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
-    if (nowUrl.search) {
+  if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') { 
+    if (nowUrl.search) { 
       const params = new URLSearchParams(nowUrl.search);
       const imgName = parseInt(params.get("id"));
-      return prescriptive(defaultPath, imgName);
+      return prescriptive(defaultPath, imgName)
+
     } else {
-      return random(defaultPath);
+     return random(defaultPath);
+
     };
   } else {
     return whetherDefault(wholePath, urlSearch);
+
   }
 }
 
@@ -56,7 +62,7 @@ function whetherDefault(wholePath, urlSearch) {
 
 function handle1(wholePath, urlSearch) {
   let imgPath = null;
-  if (urlSearch) {
+  if (urlSearch) { 
     const regex = /^\/api\/(.+[^\/])\/?$/;
     const match = wholePath.match(regex);
     if (match) { 
@@ -75,32 +81,33 @@ function handle1(wholePath, urlSearch) {
 function handle2(wholePath) {
   let imgPath = null;
   let imgName = null;
-  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/;
-  const match1 = wholePath.match(regex1);
+  const regex1 = /^\/api\/(.+[^\/])\/(\d+)\.jpg$/; 
+  const match1 = wholePath.match(regex1); 
 
   if (match1) { 
-    imgPath = `/${match1[1]}`;
+    imgPath = `/${match1[1]}`; 
     imgName = match1[2];
     return prescriptive(imgPath, imgName);
   } else {
-    const regex2 = /^\/api\/(.+[^\/])\/?$/;
+    const regex2 = /^\/api\/(.+[^\/])\/?$/; 
     const match2 = wholePath.match(regex2);
 
-    if (match2) {
+    if (match2) { 
       imgPath = `/${match2[1]}`;
       return random(imgPath);
-    } /*else { // 如果匹配不成功
-      return fetch(request); // 直接返回fetch(404.html)结果
-    }*/
+    } else { 
+      return error(); 
+    }
   }
 }
 
 
 function random(imgPath) {
-  let max = maxValues[imgPath];
-
+  if (!maxValues.hasOwnProperty(imgPath)) { 
+  return error();
+  }
+  let max = maxValues[imgPath]; 
   let imgUrl = imgHost + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
-  
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
     headers: {
@@ -114,12 +121,26 @@ function random(imgPath) {
 
 function prescriptive(imgPath, imgName) {
   let imgUrl = imgHost + imgPath + "/" + imgName + ".jpg";
-    return fetch(new Request(imgUrl), {
-      headers: {
+  if (imgPath in maxValues) {
+    if (imgName >= 1 && imgName <= maxValues[imgPath]) {
+      return fetch(new Request(imgUrl), {
+        headers: {
         'cache-control': 'max-age=0, s-maxage=0',
         'content-type': 'image/jpeg',
         'Cloudflare-CDN-Cache-Control': 'max-age=0',
         'CDN-Cache-Control': 'max-age=0'
-      },
-    });
+        },
+      });
+    } else return error();
+  } else return error();
+}
+
+async function error() {
+  let response = await fetch(url404);
+  response = new Response(response.body, {
+      status: 404,
+      statusText: 'Not Found',
+      headers: { 'Content-Type': 'text/html' }
+  });
+  return response
 }
