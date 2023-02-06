@@ -53,6 +53,32 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
 
 ### 调用参数
 
+<table>
+<thead>
+  <tr>
+    <th>可用参数</th>
+    <th>值</th>
+    <th>说明</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td align="center">type</td>
+    <td align="center">302</td>
+    <td align="center">通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等</td>
+  </tr>
+  <tr>
+    <td align="center">id</td>
+    <td align="center">&lt;数值&gt;</td>
+    <td align="center">返回名称为&lt;数值&gt;的指定图片</td>
+  </tr>
+  <tr>
+    <td align="center">不使用参数</td>
+    <td align="center">空</td>
+    <td align="center">简简单单抽张图</td>
+  </tr>
+</tbody>
+</table>
 
 <!--
 ### 举个栗子
@@ -65,6 +91,7 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
 
 访问时应使用的链接为`https://<worker域名>/api/纳西妲`
 -->
+
 ## PS
 
 1.cloudflare workers每个账户的免费额度是每天十万次请求，并且有每分钟1000次请求的限制，超出后请求会返回错误。如果不够用，可升级到 $5 的高级版本，每月可用 1000 万次请求（超出部分 $0.5/百万次请求）
