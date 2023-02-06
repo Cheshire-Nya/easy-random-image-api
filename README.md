@@ -16,7 +16,7 @@
 
 [https://demo1.randomimg.sfacg.ltd/api/demoimg/2.jpg](https://demo1.randomimg.sfacg.ltd/api/demoimg/2.jpg)查看`demoimg`下的`2.jpg`
 
-[https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302](https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302)以302返回跳转到随机一张图固定的地址，供网页使用
+[https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302](https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302)以302返回跳转到随机一张图的准确地址，供网页使用
 
 PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演示站是添加的自定义域名
 
