@@ -65,17 +65,17 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
   <tr>
     <td align="center">type</td>
     <td align="center">302</td>
-    <td align="center">通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等</td>
+    <td>通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等</td>
   </tr>
   <tr>
     <td align="center">id</td>
     <td align="center">&lt;数值&gt;</td>
-    <td align="center">返回名称为&lt;数值&gt;的指定图片</td>
+    <td>返回名称为&lt;数值&gt;的指定图片</td>
   </tr>
   <tr>
     <td align="center">不使用参数</td>
     <td align="center">空</td>
-    <td align="center">简简单单抽张图</td>
+    <td>简简单单抽张图</td>
   </tr>
 </tbody>
 </table>
