@@ -1,6 +1,7 @@
-# easy-random-img-api
+# 极简第一版
 
 ## 简介
+**各种方面上都很极简捏，比如功能极简**
 
 一个基于Github仓库和Cloudflare Workers的简单快捷可分类图片的全免费纯白嫖随机图片接口
 
