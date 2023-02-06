@@ -74,9 +74,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 ## changelog
 
-- 2023.02.06 完善错误返回
-
-- 2023.02.02 完成TODO4
+- 2023.02.06 完成TODO4，完善错误返回
 
 - 2023.02.05 完成TODO1,5,6,7
 
