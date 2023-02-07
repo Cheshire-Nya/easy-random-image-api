@@ -46,7 +46,14 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 #### 可选
 
-`redirectProxy`：返回类型为302时图片使用的代理，默认为`2`。`0`不使用代理（返回github原地址），`1`(不推荐)使用worker本身代理（返回`https://example.com/api/1.jpg`这样的链接），`2`(推荐)使用ghproxy代理（返回`ghproxy.com`代理的链接）  
+`redirectProxy`：返回类型为302时图片使用的代理，默认为`2`。
+
+`0`不使用代理（返回github原地址）
+
+`1`(不推荐)使用worker本身代理（返回`https://example.com/api/1.jpg`这样的链接）
+
+`2`(推荐)使用ghproxy代理（返回`ghproxy.com`代理的链接）  
+
 PS：如果302返回使用的是worker代理，那么相当于调用一次请求了worker两次，故不推荐
 
 `ghproxyUrl`：github加速站的链接，`ghproxy.com`能正常使用就不需要改，更换地址通常按照此格式填写`"https://example.com/"`（不能漏掉结尾的`/`）
