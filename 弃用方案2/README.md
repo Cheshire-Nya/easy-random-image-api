@@ -6,31 +6,31 @@
 
 ## 演示
 
-[https://demo2.randomimg.sfacg.ltd/api](https://demo2.randomimg.sfacg.ltd/api)
+[https://demo1.randomimg.sfacg.ltd/api](https://demo1.randomimg.sfacg.ltd/api)
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=示例图)
+[https://demo1.randomimg.sfacg.ltd/api/示例图](https://demo1.randomimg.sfacg.ltd/api/示例图)
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图)多分类抽取
+[https://demo1.randomimg.sfacg.ltd/api/demoimg](https://demo1.randomimg.sfacg.ltd/api/demoimg)
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8)查看`示例图`下的`8.jpg`
+[https://demo1.randomimg.sfacg.ltd/api/示例图/?id=8](https://demo1.randomimg.sfacg.ltd/api/示例图/?id=8)查看`示例图`下的`8.jpg`
 
-[https://demo2.randomimg.sfacg.ltd/api?type=json](https://demo2.randomimg.sfacg.ltd/api?type=json)默认分类抽取并返回json
+[https://demo1.randomimg.sfacg.ltd/api/demoimg/2.jpg](https://demo1.randomimg.sfacg.ltd/api/demoimg/2.jpg)查看`demoimg`下的`2.jpg`
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=2&type=json](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=2&type=json)指定`demoimg`下的`2.jpg`返回json
-
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&type=302](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&type=302)以302返回跳转到随机一张图的准确地址，供网页使用
+[https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302](https://demo1.randomimg.sfacg.ltd/api/demoimg?type=302)以302返回跳转到随机一张图的准确地址，供网页使用
 
 PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演示站是添加的自定义域名
 
 ## 部署和使用
 
-Github随便新建个公开仓库，**图片按`1.jpg，2.jpg，3.jpg`这样重命名后分类存到文件夹里**，不分文件夹就只能设置默认文件夹抽取
+Github随便新建个公开仓库，**图片按`1.jpg，2.jpg，3.jpg`这样重命名后塞进库里**，分不分文件夹都能用
 
 Cloudflare Worker首页：https://workers.cloudflare.com
 
 注册，登陆，`start building`，取一个worker子域名，`创建服务`，保持默认的即可。
 
 进入编辑后复制 [worker.js](https://github.com/Cheshire-Nya/easy-random-img-api/blob/main/worker.js)  到左侧代码框，**按照代码中的注释和自己的需求修改代码**，`保存并部署`。
+
+如果分了文件夹，想抽文件夹下的图片就得访问`https://<worker域名>/api/<文件夹名>`，抽取直接存仓库根目录的图片访问`https://<worker域名>/api`
 
 ### 需要修改的变量
 
@@ -63,18 +63,9 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
 </thead>
 <tbody>
   <tr>
-    <td align="center">cat</td>
-    <td align="center">图片分类（文件夹名）</td>
-    <td>在该分类中抽取图片(从多个分类中抽取应按此格式`https://example.com/api?cat=val1&cat=val2`)(没有该参数时从默认文件夹抽取)</td>
-  </tr>
-  <tr>
-    <td align="center" rowspan="2">type</td>
+    <td align="center">type</td>
     <td align="center">302</td>
-    <td>通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等(指定图片id时不允许302返回)</td>
-  </tr>
-    <tr>
-    <td align="center">json</td>
-    <td>以json格式返回，包含:分类`cat`,图片id`id`,图片github原链接`githubUrl`,worker代理链接`workerUrl`,ghproxy代理链接`proxyUrl`</td>
+    <td>通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等</td>
   </tr>
   <tr>
     <td align="center">id</td>
@@ -113,7 +104,7 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
 
 - [x] 1.支持查看指定图片
 
-- [x] 2.支持返回json
+- [ ] 2.支持返回json
 
 - [ ] 3.添加一个主页模板
 
@@ -127,7 +118,7 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
 
 - [x] 8.支持返回302到通过ghproxy或worker代理的图片地址，方便web使用不受浏览器缓存影响
 
-- [x] 9.弃用旧方案改为从url查询参数中获取分类以方便实现多个分类抽取
+- [ ] 9.弃用当前分类方案改为从url查询参数中获取分类以方便实现多个分类抽取
 
 ## 其他版本（咕咕咕）
 
@@ -136,8 +127,6 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
 - [ ] 自行存入指定图片链接的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）
 
 ## changelog
-
-- 2023.02.08 弃用旧方案，完成TODO2
 
 - 2023.02.06 完成TODO4、8，完善错误返回
 
