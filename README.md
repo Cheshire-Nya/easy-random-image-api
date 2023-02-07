@@ -65,7 +65,7 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
   <tr>
     <td align="center">cat</td>
     <td align="center">图片分类（文件夹名）</td>
-    <td>在该分类中抽取图片(从多个分类中抽取应按此格式`https://example.com/api?cat=val1&cat=val2`)(没有该参数时从默认文件夹抽取)</td>
+    <td>在该分类中抽取图片（从多个分类中抽取应按此格式`https://example.com/api?cat=val1&cat=val2`）（没有该参数时从默认文件夹抽取）</td>
   </tr>
   <tr>
     <td align="center" rowspan="2">type</td>
