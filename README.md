@@ -65,7 +65,7 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
   <tr>
     <td align="center">cat</td>
     <td align="center">图片分类（文件夹名）</td>
-    <td>在该分类中抽取图片（从多个分类中抽取应按此格式`https://example.com/api?cat=val1&cat=val2`）（没有该参数时从默认文件夹抽取）</td>
+    <td>在该分类中抽取图片（没有该参数时从默认文件夹抽取）</td>
   </tr>
   <tr>
     <td align="center" rowspan="2">type</td>
@@ -74,7 +74,7 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
   </tr>
     <tr>
     <td align="center">json</td>
-    <td>以json格式返回，包含:分类`cat`,图片id`id`,图片github原链接`githubUrl`,worker代理链接`workerUrl`,ghproxy代理链接`proxyUrl`</td>
+    <td>以json格式返回</td>
   </tr>
   <tr>
     <td align="center">id</td>
@@ -88,6 +88,20 @@ PS：如果302返回使用的是worker代理，那么相当于调用一次请求
   </tr>
 </tbody>
 </table>
+PS：
+
+- 从多个分类中抽取应按此格式`https://example.com/api?cat=val1&cat=val2`
+
+- json返回包含:分类`cat`,图片id`id`,图片github原链接`githubUrl`,worker代理链接`workerUrl`,ghproxy代理链接`proxyUrl`
+```
+{
+  "category": "示例图",
+  "id": 2,
+  "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/2.jpg",
+  "workerUrl": "https://get-img-test2.luohe.workers.dev/api?id=2&cat=示例图",
+  "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/2.jpg"
+}
+```
 
 <!--
 ### 举个栗子
