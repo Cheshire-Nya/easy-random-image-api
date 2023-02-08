@@ -10,9 +10,11 @@
 
 [https://demo2.randomimg.sfacg.ltd/api?cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=示例图)
 
+[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8)没有对应资源返回状态码404和`404.html`
+
 [https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图)多分类抽取
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8)查看`示例图`下的`8.jpg`
+[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4)查看`示例图`下的`4.jpg`
 
 [https://demo2.randomimg.sfacg.ltd/api?type=json](https://demo2.randomimg.sfacg.ltd/api?type=json)默认分类抽取并返回json
 
