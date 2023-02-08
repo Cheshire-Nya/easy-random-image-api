@@ -127,11 +127,9 @@ function extractSearch(urlSearch, request) {
 
 
 function random(imgPath) {
-  if (!maxValues.hasOwnProperty(imgPath)) {
-  return error();
-  }
   let max = maxValues[imgPath];
-  let imgUrl = imgHost + "/" + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
+  var encodedPath = encodeURIComponent(imgPath);
+  let imgUrl = imgHost + "/" + encodedPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
     headers: {
