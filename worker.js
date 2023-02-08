@@ -12,10 +12,10 @@ var defaultPath = '/'; //现在是仓库根目录(换其他文件夹格式`'/<�
 var redirectProxy = 2;
 //type=302时返回的链接是否是经过代理的，0 不代理(返回github原链接)，1 worker代理，2 ghproxy代理
 var maxValues = {
-  '/': 2, //(defaultPath和对应图片数)现在是仓库根目录，对应2张图
-  '示例图': 10, //示例图
+  "/": 2, //(defaultPath和对应图片数)现在是仓库根目录，对应2张图
+  "示例图": 10, //示例图
   //中文路径
-  'demoimg': 5, //demoimg
+  "demoimg": 5, //demoimg
   //英文路径
   //其他要抽图的文件夹和对应图片数，不用在名称前加`/`
   //其他路径下同理，只需要这样相同格式多写一条键值对即可`'<文件夹名>': <数值>,`
@@ -27,7 +27,7 @@ var min = 1;
 var max;
 
 
-async function handleRequest(request) {
+function handleRequest(request) {
   let nowUrl = new URL(request.url);
   let wholePath = nowUrl.pathname;
   let urlSearch = nowUrl.search;
@@ -47,7 +47,7 @@ async function handleRequest(request) {
   }
 }
 
-
+//开始吟唱
 function extractSearch(urlSearch, request) {
   let searchParams = new URLSearchParams(urlSearch);
   
@@ -55,80 +55,80 @@ function extractSearch(urlSearch, request) {
   let cats = searchParams.getAll('cat');
   let type = searchParams.get('type');
 
-//开始吟唱
-  let allCatsValid = true;
-  for (let i = 0; i < cats.length; i++) {
-    if (!(cats[i] in maxValues) || maxValues[cats[i]] < 1) {
-      allCatsValid = false;
-      break;
-    } else {
-      maxValues[cats[i]]--;
+  if (id && !searchParams.has('cat')) {
+    let imgName = id;
+    if (type === 'json') {
+      return typejson(defaultPath, imgName, request);
+    }
+    else if (!searchParams.has('type')) {
+      return prescriptive(defaultPath, imgName);
+    }
+	  else {
+      return error();
     }
   }
-
-  if (allCatsValid) {
-
-    if (searchParams.has('id') && !searchParams.has('cat')) {
-      let imgName = id;
-
-      if (type === 'json') {
-        return typejson(defaultPath, imgName, request);
-      }
-      else if (!searchParams.has('type')) {
-        return prescriptive(defaultPath, imgName);
-      }
-	    else {
-        return error();
-      }
+  else if (type && !searchParams.has('id') && !searchParams.has('cat')) {
+    if (type === '302') {
+      return redirect(defaultPath, request);
     }
-    else if (searchParams.has('id') && searchParams.has('cat')) {
-      let imgName = id;
-      let imgPath = cats[Math.floor(Math.random() * cats.length)];
-      if (type === 'json') {
-        return typejson(imgPath, imgName, request);
-      }
-	  else if (!searchParams.has('type')) {
-        return prescriptive(defaultPath, imgName);
-      }
-	  else {
-        return error();
-      }
-    } 
-    else if (!searchParams.has('id') && searchParams.has('cat')) {
-      let imgPath = cats[Math.floor(Math.random() * cats.length)];
-      if (type === '302') {
-        return redirect(imgPath, request);
-      } 
-      else if (type === 'json') {
-	    let max = maxValues[imgPath];
+    else if (type === 'json') {
+      let max = maxValues[defaultPath];
 	    let imgName = Math.floor(Math.random()*(max-min+1)+min);
-        return typejson(imgPath, imgName, request);
-      }
-      else if (!searchParams.has('type')) {
-        return random(imgPath);
-      }
-      else return error();
-	}
-	else if (searchParams.has('type') && !searchParams.has('id') && !searchParams.has('cat')) {
-      if (type === '302') {
-        return redirect(defaultPath, request);
-      }
-      else if (type === 'json') {
-        let max = maxValues[defaultPath];
-	    let imgName = Math.floor(Math.random()*(max-min+1)+min);
-        return typejson(defaultPath, imgName, request);
-      }
-      else return error();
+      return typejson(defaultPath, imgName, request);
     }
     else return error();
+  }
+  else if (cats) {
+    let allCatsValid = true;
+    for (let i = 0; i < cats.length; i++) {
+      if (!(cats[i] in maxValues) || maxValues[cats[i]] < 1) {
+        allCatsValid = false;
+        break;
+      } else {
+        maxValues[cats[i]]--;
+      }
+    }
+    if (allCatsValid) {    
+      if (id) {
+        let imgName = id;
+        let imgPath = cats[Math.floor(Math.random() * cats.length)];
+        if (type === 'json') {
+          return typejson(imgPath, imgName, request);
+        }
+	      else if (!searchParams.has('type')) {
+          return prescriptive(defaultPath, imgName);
+        }
+	      else {
+          return error();
+        }
+      } 
+      else if (!searchParams.has('id')) {
+        let imgPath = cats[Math.floor(Math.random() * cats.length)];
+        if (type === '302') {
+          return redirect(imgPath, request);
+        } 
+        else if (type === 'json') {
+	        let max = maxValues[imgPath];
+	        let imgName = Math.floor(Math.random()*(max-min+1)+min);
+          return typejson(imgPath, imgName, request);
+        }
+        else if (!searchParams.has('type')) {
+          return random(imgPath);
+        }
+        else return error();
+	    }
+      else return error();
+    }
+    else return error();//不支持的分类
   }
   else return error();
 }
 
 
 function random(imgPath) {
+
   let max = maxValues[imgPath];
-  let encodedPath = encodeURIComponent(imgPath);
+  var encodedPath = encodeURIComponent(imgPath);
   let imgUrl = imgHost + "/" + encodedPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
@@ -186,6 +186,7 @@ function redirect(imgPath, request) {
     return type302(redirectUrl);
   }
   else return error();
+  
 }
 
 
@@ -200,15 +201,23 @@ function type302(redirectUrl) {
 
 
 function typejson(imgPath, imgName, request) {
-  if (imgPath in maxValues) {
+
 	  if (imgName >= 1 && imgName <= maxValues[imgPath]) {
       let nowUrl = new URL(request.url);
       let myHost = nowUrl.hostname;
-	    let githubUrl = imgHost + "/" + imgPath + "/" + imgName + ".jpg";
+	    let githubUrl = null;
 	    let workerUrl = null;
-	    if (imgPath === defaultPath) { workerUrl = "https://" + myHost + "/api" + "?id=" + imgName;}
-	    else {workerUrl = "https://" + myHost + "/api" + "?id=" + imgName + "&cat=" + imgPath;}
-	    const proxyUrl = ghproxyUrl + imgHost + "/" + imgPath + "/" + imgName + ".jpg";
+	    let proxyUrl = null;
+      if (imgPath === defaultPath) {
+        githubUrl = imgHost + defaultPath + imgName + ".jpg";
+        workerUrl = "https://" + myHost + "/api" + "?id=" + imgName;
+        proxyUrl = ghproxyUrl + imgHost + defaultPath + imgName + ".jpg";
+      }
+      else {
+        githubUrl = imgHost + "/" + imgPath + "/" + imgName + ".jpg";
+        workerUrl = "https://" + myHost + "/api" + "?id=" + imgName + "&cat=" + imgPath;
+	      proxyUrl = ghproxyUrl + imgHost + "/" + imgPath + "/" + imgName + ".jpg";
+      }
 	    return new Response(
         JSON.stringify({
           "category": imgPath,
@@ -223,8 +232,7 @@ function typejson(imgPath, imgName, request) {
         });
 	  }
 	  else return error();
-  }
-  else return error();
+
 }
 
 
