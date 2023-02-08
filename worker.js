@@ -128,7 +128,7 @@ function extractSearch(urlSearch, request) {
 
 function random(imgPath) {
   let max = maxValues[imgPath];
-  var encodedPath = encodeURIComponent(imgPath);
+  let encodedPath = encodeURIComponent(imgPath);
   let imgUrl = imgHost + "/" + encodedPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
@@ -163,8 +163,9 @@ function prescriptive(imgPath, imgName) {
 
 function redirect(imgPath, request) {
   let max = maxValues[imgPath];
+  let encodedPath = encodeURIComponent(imgPath);
   if (redirectProxy === 0) {
-    const redirectUrl = imgHost + "/" + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
+    const redirectUrl = imgHost + "/" + encodedPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
     return type302(redirectUrl);
   }
   else if (redirectProxy === 1) {
@@ -175,17 +176,16 @@ function redirect(imgPath, request) {
       return type302(redirectUrl);
     }
 	else if (maxValues.hasOwnProperty(imgPath) && imgPath !== defaultPath) {
-      const redirectUrl = "https://" + myHost + "/api" + "?id=" + Math.floor(Math.random()*(max-min+1)+min) + "&cat=" + imgPath;
+      const redirectUrl = "https://" + myHost + "/api" + "?id=" + Math.floor(Math.random()*(max-min+1)+min) + "&cat=" + encodedPath;
       return type302(redirectUrl);
     }
 	else return error();
   }
   else if (redirectProxy === 2) {
-    const redirectUrl = ghproxyUrl + imgHost + "/" + imgPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
+    const redirectUrl = ghproxyUrl + imgHost + "/" + encodedPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
     return type302(redirectUrl);
   }
   else return error();
-  
 }
 
 
