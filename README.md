@@ -14,7 +14,7 @@
 
 [https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图)多分类抽取
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4)查看`示例图`下的`4.jpg`
+[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4)查看`demoimg`下的`4.jpg`
 
 [https://demo2.randomimg.sfacg.ltd/api?type=json](https://demo2.randomimg.sfacg.ltd/api?type=json)默认分类抽取并返回json
 
@@ -44,7 +44,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 `defaultPath`：当访问的url为`https://example.com/api`时抽取图片的文件夹，你可以当成默认分类
 
-`maxValues`：用来抽图的文件夹名称和对应的图片数，以键值对形式存储，格式为`'/<名称>': <数量>,`
+`maxValues`：用来抽图的文件夹名称和对应的图片数，以键值对形式存储，格式为`'<名称>': <数量>`，`defaultPath`以及对应数量应写为`/<名称>: <数量>`
 
 #### 可选
 
@@ -52,7 +52,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 `0`不使用代理（返回github原地址）
 
-`1`(不推荐)使用worker本身代理（返回`https://example.com/api/1.jpg`这样的链接）
+`1`(不推荐)使用worker本身代理（返回`https://example.com/api?id=1`这样的链接）
 
 `2`(推荐)使用ghproxy代理（返回`ghproxy.com`代理的链接）  
 
@@ -126,7 +126,7 @@ PS：
 
 ## PS
 
-- 现在的新方案可能还有一些问题，如果遇到了可以提issue，如果想稳定点，可以用旧方案
+- 不知道还有啥问题，如果遇到了可以提issue
 
 1.cloudflare workers每个账户的免费额度是每天十万次请求，并且有每分钟1000次请求的限制，超出后请求会返回错误。如果不够用，可升级到 $5 的高级版本，每月可用 1000 万次请求（超出部分 $0.5/百万次请求）
 
