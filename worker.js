@@ -12,7 +12,7 @@ var defaultPath = '/'; //现在是仓库根目录(换其他文件夹格式`'/<�
 var redirectProxy = 2;
 //type=302时返回的链接是否是经过代理的，0 不代理(返回github原链接)，1 worker代理，2 ghproxy代理
 var maxValues = {
-  "/": 2, //(defaultPath和对应图片数)现在是仓库根目录，对应2张图
+  "/": 2, //(defaultPath和对应图片数)现在是仓库根目录，对应2张图，前部需要有`/`
   "示例图": 10, //示例图
   //中文路径
   "demoimg": 5, //demoimg
@@ -50,11 +50,9 @@ function handleRequest(request) {
 //开始吟唱
 function extractSearch(urlSearch, request) {
   let searchParams = new URLSearchParams(urlSearch);
-  
   let id = searchParams.get('id');
   let cats = searchParams.getAll('cat');
   let type = searchParams.get('type');
-
   if (id && !searchParams.has('cat')) {
     let imgName = id;
     if (type === 'json') {
@@ -67,7 +65,7 @@ function extractSearch(urlSearch, request) {
       return error();
     }
   }
-  else if (type && !searchParams.has('id') && !searchParams.has('cat')) {
+	else if (type && !searchParams.has('id') && !searchParams.has('cat')) {
     if (type === '302') {
       return redirect(defaultPath, request);
     }
@@ -96,7 +94,7 @@ function extractSearch(urlSearch, request) {
           return typejson(imgPath, imgName, request);
         }
 	      else if (!searchParams.has('type')) {
-          return prescriptive(defaultPath, imgName);
+          return prescriptive(imgPath, imgName);
         }
 	      else {
           return error();
@@ -126,7 +124,6 @@ function extractSearch(urlSearch, request) {
 
 
 function random(imgPath) {
-
   let max = maxValues[imgPath];
   var encodedPath = encodeURIComponent(imgPath);
   let imgUrl = imgHost + "/" + encodedPath + "/" + Math.floor(Math.random()*(max-min+1)+min) + ".jpg";
@@ -143,9 +140,12 @@ function random(imgPath) {
 
 
 function prescriptive(imgPath, imgName) {
-  let imgUrl = imgHost + imgPath + "/" + imgName + ".jpg";
   if (imgPath in maxValues) {
     if (imgName >= 1 && imgName <= maxValues[imgPath]) {
+      if (imgPath !== defaultPath) {
+        imgPath = "/" + imgPath; //为非defaultPath路径头部添加'/'
+      }
+      let imgUrl = imgHost + imgPath + "/" + imgName + ".jpg";
       return fetch(new Request(imgUrl), {
         headers: {
         'cache-control': 'max-age=0, s-maxage=0',
@@ -154,8 +154,8 @@ function prescriptive(imgPath, imgName) {
         'CDN-Cache-Control': 'max-age=0'
         },
       });
-	}
-	else return error();
+	  }
+  	else return error();
   }
   else return error();
 }
