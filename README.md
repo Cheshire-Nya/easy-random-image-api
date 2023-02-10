@@ -140,7 +140,7 @@ PS：
 
 - [x] 2.支持返回json
 
-- [ ] 3.添加一个主页模板
+- [x] 3.添加一个主页模板
 
 - [x] 4.添加404模板
 
@@ -161,6 +161,8 @@ PS：
 - [ ] 自行存入指定图片链接的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）咕咕咕咕咕
 
 ## changelog
+
+- 2023.02.10 完成TODO3
 
 - 2023.02.08 弃用旧方案，完成TODO2
 

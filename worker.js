@@ -2,6 +2,8 @@ addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
 
+var urlIndex = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/index.html";
+//主页模板地址
 var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/404.html";
 //404模板地址
 var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main";
@@ -34,16 +36,16 @@ function handleRequest(request) {
   if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
     if (nowUrl.search) {
       return extractSearch(urlSearch, request);
-
     }
 	else {
      return random(defaultPath);
-
     };
+  }
+  else if (nowUrl.pathname === '/') {
+	return index();
   }
   else {
     return error();
-
   }
 }
 
@@ -241,6 +243,17 @@ async function error() {
   response = new Response(response.body, {
       status: 404,
       statusText: 'Not Found',
+      headers: { 'Content-Type': 'text/html' }
+  });
+  return response
+}
+
+
+async function index() {
+  let response = await fetch(urlIndex);
+  response = new Response(response.body, {
+      status: 200,
+      statusText: 'OK',
       headers: { 'Content-Type': 'text/html' }
   });
   return response
