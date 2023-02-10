@@ -6,6 +6,8 @@
 
 ## 演示
 
+[https://demo2.randomimg.sfacg.ltd](https://demo2.randomimg.sfacg.ltd)主页
+
 [https://demo2.randomimg.sfacg.ltd/api](https://demo2.randomimg.sfacg.ltd/api)
 
 [https://demo2.randomimg.sfacg.ltd/api?cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=示例图)
