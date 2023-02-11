@@ -50,7 +50,7 @@ async function extractSearch(urlSearch, request) {
     const jsonData = await response.json();
 
     const existingCats = cats.filter(cat => jsonData.hasOwnProperty(cat));
-    if (existingCats.length === 0) {
+    if (existingCats.length !== cats.length) {
       return error();
     }
 

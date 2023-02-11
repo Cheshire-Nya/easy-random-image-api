@@ -40,7 +40,9 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 #### 必选
 
-- `url404`：404页的地址
+- `urlIndex`：主页模板的地址
+
+- `url404`：404页模板的地址
 
 - `imgHost`：图片仓库的地址，通常为此格式`https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>`
 
@@ -160,9 +162,11 @@ PS：
 
 - [x] 极简简简版（留档纪念的第一版捏）
 
-- [ ] 自行存入指定图片链接的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）咕咕咕咕咕
+- [x] 自行存入图片信息的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）
 
 ## changelog
+
+- 2023.02.11 方案3
 
 - 2023.02.10 完成TODO3
 
