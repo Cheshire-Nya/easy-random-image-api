@@ -30,7 +30,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 注册，登陆，`start building`，取一个worker子域名，`创建服务`，保持默认的即可。
 
-进入编辑后复制 [worker.js](https://github.com/Cheshire-Nya/easy-random-img-api/blob/main/worker.js)  到左侧代码框，**按照代码中的注释和自己的需求修改代码**，`保存并部署`。
+进入编辑后复制`worker.js`中的代码到左侧代码框，**按照代码中的注释和自己的需求修改代码**，`保存并部署`。
 
 如果分了文件夹，想抽文件夹下的图片就得访问`https://<worker域名>/api/<文件夹名>`，抽取直接存仓库根目录的图片访问`https://<worker域名>/api`
 
