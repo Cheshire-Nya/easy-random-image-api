@@ -77,8 +77,8 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 <tbody>
   <tr>
     <td align="center">cat<br>（必须参数）</td>
-    <td align="center">图片分类</td>
-    <td>在该分类中抽取图片（没有该参数时从默认文件夹抽取）</td>
+    <td align="center">json文件中的键</td>
+    <td>在该分类中抽取图片</td>
   </tr>
   <tr>
     <td align="center" rowspan="2">type</td>
