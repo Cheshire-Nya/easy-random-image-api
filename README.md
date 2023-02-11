@@ -4,6 +4,8 @@
 
 一个基于Github仓库和Cloudflare Workers的简单快捷可分类图片的全免费纯白嫖随机图片接口实现
 
+ps：其实我觉得方案三更好
+
 ## 演示
 
 [https://demo2.randomimg.sfacg.ltd](https://demo2.randomimg.sfacg.ltd)主页
