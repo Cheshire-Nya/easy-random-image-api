@@ -30,7 +30,7 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 
 Github随便新建个公开仓库，**图片塞进库里想怎么放就怎么放**
 
-**参照`image.json`编写你自己的json文件**，随便放哪里，其他网站目录或服务器都行，只要能通过公网访问到即可
+**参照`image.json`编写你自己的json文件**，随便放哪里，仓库、其他网站目录或服务器都行，只要能通过公网访问到即可
 
 Cloudflare Worker首页：https://workers.cloudflare.com
 
