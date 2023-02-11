@@ -14,7 +14,7 @@
 
 [https://demo3.randomimg.sfacg.ltd/api?cat=category1](https://demo3.randomimg.sfacg.ltd/api?cat=category1)
 
-[https://demo3.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图](https://demo3.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图)多分类抽取
+[https://demo3.randomimg.sfacg.ltd/api?cat=category1&cat=category2](https://demo3.randomimg.sfacg.ltd/api?cat=category1&cat=category2)多分类抽取
 
 [https://demo3.randomimg.sfacg.ltd/api?cat=category1&id=4](https://demo3.randomimg.sfacg.ltd/api?cat=category1&id=4)抽取`image.json`中`category1`分类下的第四张图
 
