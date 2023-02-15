@@ -114,11 +114,12 @@ PS：
 - json返回包含:分类`cat`,适合的设备`device`,图片id`id`,图片github原链接`githubUrl`,worker代理链接`workerUrl`,ghproxy代理链接`proxyUrl`
 ```
 {
-  "category": "category1",
+  "category": "category2",
+  "device": "pc",
   "id": 2,
-  "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg/2.jpg",
-  "workerUrl": "https://get-img-test2.luohe.workers.dev/api?cat=category1&id=2",
-  "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg/2.jpg"
+  "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/6.jpg",
+  "workerUrl": "https://demo4.randomimg.sfacg.ltd/api?cat=category2&device=pc&id=2",
+  "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/6.jpg"
 }
 ```
 
