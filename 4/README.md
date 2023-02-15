@@ -18,7 +18,7 @@
 
 [https://demo4.randomimg.sfacg.ltd/api?cat=category1&cat=category2](https://demo4.randomimg.sfacg.ltd/api?cat=category1&cat=category2)多分类抽取
 
-[https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=4](https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2)抽取`image.json`中`category1`分类适合移动端查看的第2张图
+[https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2](https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2)抽取`image.json`中`category1`分类适合移动端查看的第2张图
 
 [https://demo4.randomimg.sfacg.ltd/api?cat=category2&type=json](https://demo4.randomimg.sfacg.ltd/api?cat=category2&type=json)随机抽取`category2`分类并返回json
 
