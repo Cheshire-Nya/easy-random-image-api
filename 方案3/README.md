@@ -106,7 +106,7 @@ PS：
   "category": "category1",
   "id": 2,
   "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg/2.jpg",
-  "workerUrl": "https://get-img-test2.luohe.workers.dev/api?cat=category1&id=2",
+  "workerUrl": "https://demo3.randomimg.sfacg.ltd/api?cat=category1&id=2",
   "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg/2.jpg"
 }
 ```

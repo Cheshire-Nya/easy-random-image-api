@@ -113,7 +113,7 @@ PS：
   "category": "示例图",
   "id": 2,
   "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/2.jpg",
-  "workerUrl": "https://get-img-test2.luohe.workers.dev/api?id=2&cat=示例图",
+  "workerUrl": "https://demo2.randomimg.sfacg.ltd/api?id=2&cat=示例图",
   "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/2.jpg"
 }
 ```
