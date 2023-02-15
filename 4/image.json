@@ -1,0 +1,28 @@
+{
+    "category1": {
+      "mobile": [
+        "demoimg/1.jpg",
+        "1.jpg",
+        "示例图/1.jpg"
+      ],
+      "pc": [
+        "demoimg/2.jpg",
+        "2.jpg",
+        "示例图/2.jpg"
+      ]
+    },
+    "category2": {
+      "mobile": [
+        "demoimg/3.jpg",
+        "demoimg/4.jpg",
+        "demoimg/5.jpg",
+        "示例图/3.jpg",
+        "示例图/4.jpg"
+      ],
+      "pc": [
+        "示例图/5.jpg",
+        "示例图/6.jpg",
+        "示例图/7.jpg"
+      ]
+    }
+}
