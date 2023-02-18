@@ -1,10 +1,10 @@
-var jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/4/image.json";
+var jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/5/image.json";
 //json文件的地址
 var urlIndex = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/index.html";
 //主页模板地址
 var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/404.html";
 //404模板地址
-var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/";
+var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/5/";
 //图片地址前部不会发生改变的部分
 //用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>/"
 var redirectProxy = 2;
@@ -147,12 +147,12 @@ function image(img, returnForm) {
 
 function redirect(id, img, category, device, request) {
   let nowUrl = new URL(request.url);
-  let searchParams = nowUrl.search;
+  let searchParams = new URLSearchParams(nowUrl.search);
   let returnForm = searchParams.get('form');
   if (!searchParams.has('form')) {returnForm = "jpg";}
-  let encodedImh = encodeURIComponent(img);
+//  let encodedImg = encodeURIComponent(img);
   if (redirectProxy === 0) {
-    const redirectUrl = imgHost + returnForm + "/" + encodedImg + "." + returnForm;
+    const redirectUrl = imgHost + returnForm + "/" + img + "." + returnForm;
     return type302(redirectUrl);
   }
   else if (redirectProxy === 1) {
@@ -162,7 +162,7 @@ function redirect(id, img, category, device, request) {
     return type302(redirectUrl);
   }
   else if (redirectProxy === 2) {
-    const redirectUrl = ghproxyUrl + imgHost + returnForm + "/" + encodedImg + "." + returnForm;
+    const redirectUrl = ghproxyUrl + imgHost + returnForm + "/" + img + "." + returnForm;
     return type302(redirectUrl);
   }
   else return error();
@@ -182,6 +182,7 @@ function type302(redirectUrl) {
 
 function typejson(id, img, category, device, request) {
   let nowUrl = new URL(request.url);
+  let searchParams = new URLSearchParams(nowUrl.search);
   let returnForm = searchParams.get('form');
   if (!searchParams.has('form')) {returnForm = "jpg";}
   let myHost = nowUrl.hostname;
@@ -225,9 +226,4 @@ async function index() {
       headers: { 'Content-Type': 'text/html' }
   });
   return response
-}
-
-
-function returnForm() {
-  
 }
