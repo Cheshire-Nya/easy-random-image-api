@@ -1,0 +1,29 @@
+{
+    "category1": {
+      "mobile": [
+        "1",
+        "2",
+		"7",
+		"8",
+		"10"
+      ],
+      "pc": [
+	    "demoimg/aa",
+        "demoimg/bb"
+      ]
+    },
+    "category2": {
+      "mobile": [
+	    "3",
+		"4",
+        "5",
+        "6",
+		"9"
+      ],
+      "pc": [
+        "demoimg/cc",
+        "demoimg/dd",
+        "demoimg/ee"
+      ]
+    }
+}
