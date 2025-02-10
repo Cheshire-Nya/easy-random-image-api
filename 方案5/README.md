@@ -58,7 +58,9 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 - `jsonUrl`：存储图片信息的json文件地址
 
-- `availableDevices`：除jpg外新添加的其他格式
+- `availableExtraForms`：除jpg外新添加的其他格式
+
+- `availableDevices`：图片分辨率适合的设备分类
 
 #### 可选
 

@@ -3,12 +3,12 @@
       "mobile": [
         "demoimg/1.jpg",
         "1.jpg",
-        "示例图/1.jpg"
+        "demoimg1/1.jpg"
       ],
       "pc": [
         "demoimg/2.jpg",
         "2.jpg",
-        "示例图/2.jpg"
+        "demoimg1/2.jpg"
       ]
     },
     "category2": {
@@ -16,13 +16,13 @@
         "demoimg/3.jpg",
         "demoimg/4.jpg",
         "demoimg/5.jpg",
-        "示例图/3.jpg",
-        "示例图/4.jpg"
+        "demoimg1/3.jpg",
+        "demoimg1/4.jpg"
       ],
       "pc": [
-        "示例图/5.jpg",
-        "示例图/6.jpg",
-        "示例图/7.jpg"
+        "demoimg1/5.jpg",
+        "demoimg1/6.jpg",
+        "demoimg1/7.jpg"
       ]
     }
 }

@@ -11,14 +11,15 @@ var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-
 //用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>"
 var defaultPath = '/'; //现在是仓库根目录(换其他文件夹格式`'/<文件夹名>'`)
 //访问的url路径为`/api`或`/api/`时抽图的文件夹
-var redirectProxy = 2;
+var redirectProxy = 1;
 //type=302时返回的链接是否是经过代理的，0 不代理(返回github原链接)，1 worker代理，2 ghproxy代理
 var maxValues = {
   "/": 2, //(defaultPath和对应图片数)现在是仓库根目录，对应2张图，前部需要有`/`
-  "示例图": 10, //示例图
-  //中文路径
+  "demoimg1": 10, //示例图
+  //路径1
   "demoimg": 5, //demoimg
-  //英文路径
+  //路径2
+  //文件夹名需为纯英文字符，中文在链接中会被转码然后出奇奇怪怪的问题
   //其他要抽图的文件夹和对应图片数，不用在名称前加`/`
   //其他路径下同理，只需要这样相同格式多写一条键值对即可`'<文件夹名>': <数值>,`
 }
@@ -79,7 +80,7 @@ function extractSearch(urlSearch, request) {
     else return error();
   }
   else if (cats) {
-    let allCatsValid = true;
+    /*多余的错误逻辑
     for (let i = 0; i < cats.length; i++) {
       if (!(cats[i] in maxValues) || maxValues[cats[i]] < 1) {
         allCatsValid = false;
@@ -88,38 +89,36 @@ function extractSearch(urlSearch, request) {
         maxValues[cats[i]]--;
       }
     }
-    if (allCatsValid) {    
-      if (id) {
-        let imgName = id;
-        let imgPath = cats[Math.floor(Math.random() * cats.length)];
-        if (type === 'json') {
-          return typejson(imgPath, imgName, request);
-        }
-	      else if (!searchParams.has('type')) {
-          return prescriptive(imgPath, imgName);
-        }
-	      else {
-          return error();
-        }
+    */   
+    if (id) {
+      let imgName = id;
+      let imgPath = cats;
+      if (type === 'json') {
+        return typejson(imgPath, imgName, request);
+      }
+	    else if (!searchParams.has('type')) {
+        return prescriptive(imgPath, imgName);
+      }
+	    else {
+        return error();
+      }
+    } 
+    else if (!searchParams.has('id')) {
+      let imgPath = cats[Math.floor(Math.random() * cats.length)];
+      if (type === '302') {
+        return redirect(imgPath, request);
       } 
-      else if (!searchParams.has('id')) {
-        let imgPath = cats[Math.floor(Math.random() * cats.length)];
-        if (type === '302') {
-          return redirect(imgPath, request);
-        } 
-        else if (type === 'json') {
-	        let max = maxValues[imgPath];
-	        let imgName = Math.floor(Math.random()*(max-min+1)+min);
-          return typejson(imgPath, imgName, request);
-        }
-        else if (!searchParams.has('type')) {
-          return random(imgPath);
-        }
-        else return error();
-	    }
+      else if (type === 'json') {
+	      let max = maxValues[imgPath];
+	      let imgName = Math.floor(Math.random()*(max-min+1)+min);
+        return typejson(imgPath, imgName, request);
+      }
+      else if (!searchParams.has('type')) {
+        return random(imgPath);
+      }
       else return error();
-    }
-    else return error();//不支持的分类
+	  }
+    else return error();
   }
   else return error();
 }

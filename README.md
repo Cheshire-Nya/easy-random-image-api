@@ -14,11 +14,11 @@
 
 [https://demo2.randomimg.sfacg.ltd/api](https://demo2.randomimg.sfacg.ltd/api)
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=示例图)
+[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg1](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg1)
 
 [https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8)没有对应资源返回状态码404和`404.html`
 
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=示例图)多分类抽取
+[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=demoimg1](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=demoimg1)多分类抽取
 
 [https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4)查看`demoimg`下的`4.jpg`
 
@@ -112,11 +112,11 @@ PS：
 - json返回包含:分类`cat`,图片id`id`,图片github原链接`githubUrl`,worker代理链接`workerUrl`,ghproxy代理链接`proxyUrl`
 ```
 {
-  "category": "示例图",
+  "category": "demoimg1",
   "id": 2,
-  "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/2.jpg",
-  "workerUrl": "https://demo2.randomimg.sfacg.ltd/api?id=2&cat=示例图",
-  "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/示例图/2.jpg"
+  "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg1/2.jpg",
+  "workerUrl": "https://demo2.randomimg.sfacg.ltd/api?id=2&cat=demoimg1",
+  "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg1/2.jpg"
 }
 ```
 
