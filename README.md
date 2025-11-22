@@ -8,6 +8,8 @@
 
 希望类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)食用方法的直接看方案3,4,5
 
+**最完善的为方案5，通常也会是最新且bug最少的**
+
 ## 演示
 
 [https://demo2.randomimg.sfacg.ltd](https://demo2.randomimg.sfacg.ltd)主页

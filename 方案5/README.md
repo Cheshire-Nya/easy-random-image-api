@@ -20,11 +20,11 @@ cloudflare worker无法使用使用canvas api或第三方库进行转码，**所
 
 [https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)`cat`为必须参数，不存在就返回404
 
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1](https://demo5.randomimg.sfacg.ltd/api?cat=category1)无form默认jpg
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1](https://demo5.randomimg.sfacg.ltd/api?cat=category1)无form默认jpg且**自动识别设备类型（129行的函数，应该能判断出大部分设备，可以修改）**
 
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp](https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp)`category2`分类webp
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp](https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp)`category2`分类webp，自动识别设备类型
 
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2](https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2)多分类抽取
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2](https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2)多分类抽取自动识别设备类型
 
 [https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2](https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2)抽取`image.json`中`category1`分类适合移动端查看的第2张图
 
@@ -44,7 +44,7 @@ Github随便新建个公开仓库，**新建文件夹`jpg`和其他你想要的�
 
 Cloudflare Worker首页：https://workers.cloudflare.com
 
-注册，登陆，`start building`，取一个worker子域名，`创建服务`，保持默认的即可。
+注册，登陆，`start building`，取一个worker子域名，`创建服务`，不需要使用模板创建worker，直接hello weorld创建即可。
 
 进入编辑后复制 本文件夹下的 `worker.js`  到左侧代码框，**按照代码中的注释和自己的需求修改代码**，`保存并部署`。
 
@@ -62,11 +62,11 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 
 - `availableExtraForms`：除jpg外新添加的其他格式
 
-- `availableDevices`：图片分辨率适合的设备分类
+- `availableDevices`：图片分辨率适合的设备分类，**一般不需要改这个了，改了就要改代码，如果可以更加细分设备，欢迎pr**
 
 #### 可选
 
-- `redirectProxy`：返回类型为302时图片使用的代理，默认为`2`。
+- `redirectProxy`：返回类型为302时图片使用的代理，默认为`1`。
 
    `0`不使用代理（返回github原地址）
 
@@ -91,7 +91,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
 <tbody>
   <tr>
     <td align="center">cat<br>（必须参数）</td>
-    <td align="center">json文件中的键</td>
+    <td align="center">json文件中的key</td>
     <td>在该分类中抽取图片</td>
   </tr>
   <tr>
@@ -104,7 +104,7 @@ Cloudflare Worker首页：https://workers.cloudflare.com
     <td>以json格式返回</td>
   </tr>
   <tr>
-    <td align="center" rowspan="2">device<br>(不指定device不允许使用id)</td>
+    <td align="center" rowspan="2">device<br>(不指定device时会由函数来判断设备类型)<br>(这时不允许使用id参数)</td>
     <td align="center">pc</td>
     <td>返回适合pc的图片</td>
   </tr>
@@ -152,7 +152,7 @@ PS：
 
 3. 理论上可以无限白嫖，多注册几个账号，其他服务调用随机图时多写个逻辑返回错误请求另外的接口即可。唯一的成本是大陆访问需要绑自定义域名，但是域名可以白嫖免费域名或者一年十几二十块的便宜域名，四舍五入就是妹花钱。添加自定义域在[Cloudflare控制台](https://dash.cloudflare.com/)中`网站`里按指引操作，选择free计划即可。
 
-4. **错误返回偷懒没完善**
+4. **~~错误返回偷懒没完善~~**(差不多好了)
 
 5. **主页和404页没啥卵用，建议用的时候删了**
 
