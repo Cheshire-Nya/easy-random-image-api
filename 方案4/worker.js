@@ -98,15 +98,13 @@ async function extractSearch(urlSearch, request) {
     if (!device) {
       let randomDevice = availableDevices[Math.floor(Math.random() * availableDevices.length)];
       
-      // 【关键修复】如果原代码中用户指定了 ID 但没指定 Device，会直接报错。
-      // 这里如果不指定 Device，我们通常不允许指定 ID，因为不知道该去 Mobile 还是 PC 列表找第 N 张图。
       // 维持原逻辑，但给出明确错误。
       if (searchParams.has('id')) {
          return error("Cannot specify ID without specifying Device");
       }
 
       const values = selectedList[randomDevice];
-      if (!values) return error("Random device list missing"); // 防御性编程
+      if (!values) return error("Random device list missing");
 
       const trueId = Math.floor(Math.random() * values.length);
       const img = values[trueId];
@@ -194,7 +192,6 @@ function typejson(id, img, category, device, request) {
 }
 
 // 优化后的 Error 函数，带 Debug Header
-// 替换原来的 async function error() {...}
 
 async function error(reason = "Unknown Error") {
   let htmlContent = "";

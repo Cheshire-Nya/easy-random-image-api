@@ -1,4 +1,3 @@
-
 var jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%883/image.json";
 //json文件的地址
 var urlIndex = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/index.html";
@@ -8,88 +7,117 @@ var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-a
 var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/";
 //图片地址前部不会发生改变的部分
 //用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>/"
-var redirectProxy = 2;
+var redirectProxy = 1;
 //type=302时返回的链接是否是经过代理的，0 不代理(返回github原链接)，1 worker代理，2 ghproxy代理
 
 var ghproxyUrl = "https://ghproxy.com/";
 
+//【注意】上述url中的所有中文都需写成utf8编码形式，不然会一直给你丢到404，比如我的json地址是"方案3/image.json"写成了"/%E6%96%B9%E6%A1%883/image.json"
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
 
 
-function handleRequest(request) {
+async function handleRequest(request) {
   let nowUrl = new URL(request.url);
-  let wholePath = nowUrl.pathname;
   let urlSearch = nowUrl.search;
+
+  // 允许 /api 和 /api/
   if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
-    if (nowUrl.search) {
+    if (urlSearch) {
       return extractSearch(urlSearch, request);
+    } else {
+      return error("No search parameters provided");
     }
-	  else {
-     return error();
-    };
-  }
-  else if (nowUrl.pathname === '/') {
-	return index();
-  }
-  else {
-    return error();
+  } else if (nowUrl.pathname === '/') {
+    return index();
+  } else {
+    return error("Invalid path");
   }
 }
+
 
 //开始吟唱
 async function extractSearch(urlSearch, request) {
   let searchParams = new URLSearchParams(urlSearch);
   let id = searchParams.get('id');
-  let cats = searchParams.getAll('cat');
+  let cats = searchParams.getAll('cat'); // 获取所有 cat 参数
   let type = searchParams.get('type');
-  if (cats) {
+
+  //确保真的传了分类参数
+  if (cats && cats.length > 0) {
+    
+    // 获取 JSON 配置
     const response = await fetch(jsonUrl);
+    
+    //检查 JSON 是否成功获取
+    if (!response.ok) {
+      return error("Failed to fetch JSON config");
+    }
+
     const jsonData = await response.json();
 
     const existingCats = cats.filter(cat => jsonData.hasOwnProperty(cat));
     if (existingCats.length !== cats.length) {
-      return error();
+      return error("Category not found in JSON");
     }
 
+    // 随机选一个分类
     const category = existingCats[Math.floor(Math.random() * existingCats.length)];
-    if (!searchParams.has('id')) {
-      const values = jsonData[category];
-      const trueId = Math.floor(Math.random() * values.length);
-      const img = values[trueId];
-      if (type === '302') {
-        return redirect(trueId + 1, img, category, request);
-      }
-      else if (type === 'json') {
-        return typejson(trueId + 1, img, category, request);
-      }
-      else if (!searchParams.has('type')) {
-        return image(img);
-      }
-      else return error();
+    const values = jsonData[category];
+
+    if (!values || values.length === 0) {
+      return error("Category is empty");
     }
-    else if (id) {
-      const values = jsonData[category];
-      const trueId = id - 1;
-      const img = values[trueId];
-      if (type === 'json') {
-        return typejson(id, img, category, request);
+
+    let trueId;
+    let img;
+
+    if (searchParams.has('id')) {
+      let reqId = parseInt(id);
+      
+      if (isNaN(reqId)) {
+        return error("ID must be a number");
       }
-      else if (!searchParams.has('type')) {
-        return image(img);
+      
+      if (reqId < 1 || reqId > values.length) {
+        return error("ID out of range (1-" + values.length + ")");
       }
-      else return error();
+      
+      trueId = reqId - 1; // 转换为数组索引
+      img = values[trueId];
+      
+    } else {
+      trueId = Math.floor(Math.random() * values.length);
+      img = values[trueId];
     }
-    else return error()
+
+    if (type === '302') {
+      return redirect(trueId + 1, img, category, request);
+    } 
+    else if (type === 'json') {
+      return typejson(trueId + 1, img, category, request);
+    } 
+    else if (!type) {
+      return image(img);
+    } 
+    else {
+      return error("Invalid type param");
+    }
+
+  } else {
+    return error("No category specified");
   }
-  else return error();//cat为必须，没有则抛出错误
 }
 
 
 function image(img) {
-  let encodedImg = encodeURIComponent(img);
+  // 原let encodedImg = encodeURIComponent(img); 
+  // 会把 'demoimg/1.jpg' 变成 'demoimg%2F1.jpg'
+  //按斜杠分割，只转义每一部分（例如处理空格），然后再用斜杠拼回去
+  let encodedImg = img.split('/').map(part => encodeURIComponent(part)).join('/');
+  
   let imgUrl = imgHost + encodedImg;
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
@@ -104,9 +132,11 @@ function image(img) {
 
 
 function redirect(id, img, category, request) {
-  let encodedImh = encodeURIComponent(img);
+  // 同样使用智能转义处理路径
+  let encodedImg = img.split('/').map(part => encodeURIComponent(part)).join('/');
+  
   if (redirectProxy === 0) {
-    const redirectUrl = imgHost + img;
+    const redirectUrl = imgHost + encodedImg; // 使用处理后的路径
     return type302(redirectUrl);
   }
   else if (redirectProxy === 1) {
@@ -116,11 +146,10 @@ function redirect(id, img, category, request) {
     return type302(redirectUrl);
   }
   else if (redirectProxy === 2) {
-    const redirectUrl = ghproxyUrl + imgHost + img;
+    const redirectUrl = ghproxyUrl + imgHost + encodedImg; // 使用处理后的路径
     return type302(redirectUrl);
   }
-  else return error();
-  
+  else return error("Invalid redirect config");
 }
 
 
@@ -137,10 +166,11 @@ function type302(redirectUrl) {
 function typejson(id, img, category, request) {
   let nowUrl = new URL(request.url);
   let myHost = nowUrl.hostname;
-	let githubUrl = imgHost + img;
-	let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&id=" + id;
-	let proxyUrl = ghproxyUrl + imgHost + img;   
-	return new Response(
+  let githubUrl = imgHost + img;
+  // 修正 query 拼接
+  let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&id=" + id;
+  let proxyUrl = ghproxyUrl + imgHost + img;   
+  return new Response(
     JSON.stringify({
       "category": category,
       "id": id,
@@ -152,27 +182,66 @@ function typejson(id, img, category, request) {
       'Content-Type': 'application/json'
     }
   });
-
 }
 
+// 优化后的 Error 函数，带 Debug Header
 
-async function error() {
-  let response = await fetch(url404);
-  response = new Response(response.body, {
-      status: 404,
-      statusText: 'Not Found',
-      headers: { 'Content-Type': 'text/html' }
+async function error(reason = "Unknown Error") {
+  let htmlContent = "";
+  let isFallback = false;
+
+  try {
+    const response = await fetch(url404);
+    // 如果 404 模板加载成功 (状态码 200-299)
+    if (response.ok) {
+      htmlContent = await response.text();
+    } else {
+      throw new Error("404 Template not found");
+    }
+  } catch (e) {
+    // 如果连 404 模板都获取失败，使用这个备用的简易 HTML
+    isFallback = true;
+    htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>404 Not Found</title>
+      <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
+        h1 { font-size: 48px; color: #333; }
+        p { font-size: 18px; color: #666; }
+        .debug { margin-top: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; display: inline-block; text-align: left; color: #d9534f; }
+      </style>
+    </head>
+    <body>
+      <h1>404 - Not Found</h1>
+      <p>The requested image or category could not be found.</p>
+      <div class="debug">
+        <strong>Debug Info:</strong><br>
+        Reason: ${reason}<br>
+        <small>(Note:404.html template also failed to load, so you are seeing this fallback page.)</small>
+      </div>
+    </body>
+    </html>
+    `;
+  }
+
+  return new Response(htmlContent, {
+    status: 404,
+    statusText: 'Not Found',
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'X-Error-Reason': reason,
+      'X-Error-Fallback': isFallback ? 'true' : 'false'
+    }
   });
-  return response
 }
-
 
 async function index() {
   let response = await fetch(urlIndex);
-  response = new Response(response.body, {
+  return new Response(response.body, {
       status: 200,
       statusText: 'OK',
       headers: { 'Content-Type': 'text/html' }
   });
-  return response
 }
