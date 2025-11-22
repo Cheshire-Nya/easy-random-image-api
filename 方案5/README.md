@@ -13,27 +13,29 @@
 cloudflare worker无法使用使用canvas api或第三方库进行转码，**所以其他格式图片需要自行上传，且不同格式图片文件夹的目录结构、文件名须保持一致**，目录格式参照本文件夹下的`jpg`，`webp`
 
 图片批量转码和压缩推荐使用[caesium](https://saerasoft.com/caesium#downloads)，可以保留目录结构转码压缩
-<!--
+
 ## 演示
 
-[https://demo4.randomimg.sfacg.ltd](https://demo4.randomimg.sfacg.ltd)主页
+[https://demo5.randomimg.sfacg.ltd](https://demo5.randomimg.sfacg.ltd)主页
 
-[https://demo4.randomimg.sfacg.ltd/api](https://demo4.randomimg.sfacg.ltd/api)`cat`为必须参数，不存在就返回404
+[https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)`cat`为必须参数，不存在就返回404
 
-[https://demo4.randomimg.sfacg.ltd/api?cat=category1](https://demo4.randomimg.sfacg.ltd/api?cat=category1)
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1](https://demo5.randomimg.sfacg.ltd/api?cat=category1)无form默认jpg
 
-[https://demo4.randomimg.sfacg.ltd/api?cat=category1&cat=category2](https://demo4.randomimg.sfacg.ltd/api?cat=category1&cat=category2)多分类抽取
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp](https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp)`category2`分类webp
 
-[https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2](https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2)抽取`image.json`中`category1`分类适合移动端查看的第2张图
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2](https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2)多分类抽取
 
-[https://demo4.randomimg.sfacg.ltd/api?cat=category2&type=json](https://demo4.randomimg.sfacg.ltd/api?cat=category2&type=json)随机抽取`category2`分类并返回json
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2](https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2)抽取`image.json`中`category1`分类适合移动端查看的第2张图
 
-[https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=pc&id=2&type=json](https://demo4.randomimg.sfacg.ltd/api?cat=category1&device=pc&id=2&type=json)指定`category1`分类适合pc端的第二张并返回json
+[https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json](https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json)随机抽取`category2`分类并返回json
 
-[https://demo4.randomimg.sfacg.ltd/api?cat=category1&type=302](https://demo4.randomimg.sfacg.ltd/api?cat=category1&type=302)以302返回跳转到随机一张图的准确地址，供网页使用
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=pc&id=2&type=json](https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=pc&id=2&type=json)指定`category1`分类适合pc端的第二张并返回json
+
+[https://demo5.randomimg.sfacg.ltd/api?cat=category1&type=302](https://demo5.randomimg.sfacg.ltd/api?cat=category1&type=302)以302返回跳转到随机一张图的准确地址，供网页使用
 
 PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演示站是添加的自定义域名
--->
+
 ## 部署和使用
 
 Github随便新建个公开仓库，**新建文件夹`jpg`和其他你想要的格式对应的文件夹，jpg图片塞进jpg文件夹这样**

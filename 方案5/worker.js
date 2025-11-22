@@ -1,4 +1,6 @@
-var jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/5/image.json";
+// ================= 配置区域 =================
+
+var jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/image.json";
 //json文件的地址
 var urlIndex = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/index.html";
 //主页模板地址
@@ -7,41 +9,40 @@ var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-a
 var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/5/";
 //图片地址前部不会发生改变的部分
 //用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>/"
-var redirectProxy = 2;
+var redirectProxy = 1;
 //type=302时返回的链接是否是经过代理的，0 不代理(返回github原链接)，1 worker代理，2 ghproxy代理
 var availableExtraForms = ["webp"];
 //除默认的jpg外，你额外增加的可以返回的图片格式
 var availableDevices = ["mobile", "pc"];
-//允许的图片分辨率适合的设备分类，通常就这俩，没啥好改的
 var ghproxyUrl = "https://ghproxy.com/";
+//(这个ghproxy有问题，除非你有其他的github代理)
 
+//【注意】上述url中的所有中文都需写成utf8编码形式，不然会一直给你丢到404，比如我的json地址是"/方案5/image.json"写成了"/%E6%96%B9%E6%A1%885/image.json"
+
+
+// ===========================================
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
 
-
-function handleRequest(request) {
+async function handleRequest(request) {
   let nowUrl = new URL(request.url);
-  let wholePath = nowUrl.pathname;
   let urlSearch = nowUrl.search;
+
   if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
-    if (nowUrl.search) {
+    if (urlSearch) {
       return extractSearch(urlSearch, request);
+    } else {
+      return error("No search parameters");
     }
-	  else {
-     return error();
-    };
-  }
-  else if (nowUrl.pathname === '/') {
-	return index();
-  }
-  else {
-    return error();
+  } else if (nowUrl.pathname === '/') {
+    return index();
+  } else {
+    return error("Invalid Path");
   }
 }
 
-//开始吟唱
 async function extractSearch(urlSearch, request) {
   let searchParams = new URLSearchParams(urlSearch);
   let id = searchParams.get('id');
@@ -49,181 +50,192 @@ async function extractSearch(urlSearch, request) {
   let type = searchParams.get('type');
   let device = searchParams.get('device');
   let returnForm = searchParams.get('form');
-  
-  if (returnForm) {
-	if (!availableExtraForms.includes(returnForm)) {
-	  return error();
-	}
-  } //如果有则判断form参数的值是否存在于availableExtraForms
-  
-  if (cats) {
-    const response = await fetch(jsonUrl);
-    const imgList = await response.json();
 
+  // 如果没有指定 form，默认为 jpg
+  if (!returnForm) {
+    returnForm = 'jpg';
+  } 
+  else if (returnForm !== 'jpg' && !availableExtraForms.includes(returnForm)) {
+    return error("Invalid image format: " + returnForm);
+  }
+
+  if (cats && cats.length > 0) {
+    const response = await fetch(jsonUrl);
+    if (!response.ok) return error("Failed to fetch JSON config");
+    
+    const imgList = await response.json();
     let availableCategories = Object.keys(imgList);
+
     if (!cats.every(cat => availableCategories.includes(cat))) {
-      return error(); //遍历cats不是json中category的子集则error
+      return error("Category not found");
     }
 
-    const category = cats[Math.floor(Math.random() *cats.length)];
+    const category = cats[Math.floor(Math.random() * cats.length)];
     const selectedList = imgList[category];
 
-    if (device) {
-      if (!searchParams.has('id')) {
-        const values = selectedList[device];
-        const trueId = Math.floor(Math.random() * values.length);
-        const img = values[trueId];
-        if (type === '302') {
-          return redirect(trueId + 1, img, category, device, request);
+    let selectedDevice = device;
+    if (!selectedDevice) {
+        if (searchParams.has('id')) {
+            return error("Cannot specify ID without Device");
         }
-        else if (type === 'json') {
-          return typejson(trueId + 1, img, category, device, request);
-        }
-        else if (!searchParams.has('type')) {
-          if (returnForm) {
-			return image(img, returnForm);
-		  }
-		  else return image(img, 'jpg');
-        }
-        else return error();
-      }
-      else if (id) {
-        const values = selectedList[device];
-        const trueId = id - 1;
-        const img = values[trueId];
-        if (type === 'json') {
-          return typejson(id, img, category, device, request);
-        }
-        else if (!searchParams.has('type')) {
-          if (returnForm) {
-			return image(img, returnForm);
-		  }
-		  else return image(img, 'jpg');
-        }
-        else return error(); //有type但不为json时返回错误
-      }
-      else return error()
-    }//指定适合的设备，结束
-    if (!device) { //不指定适合的设备，开始
-      let device = availableDevices[Math.floor(Math.random() * availableDevices.length)]; //从availableDevices中抽取device
-      if (!searchParams.has('id')) {
-        const values = selectedList[device];
-        const trueId = Math.floor(Math.random() * values.length);
-        const img = values[trueId];
-        if (type === '302') {
-          return redirect(trueId + 1, img, category, device, request);
-        }
-        else if (type === 'json') {
-          return typejson(trueId + 1, img, category, device, request);
-        }
-        else if (!searchParams.has('type')) {
-          if (returnForm) {
-			return image(img, returnForm);
-		  }
-		  else return image(img, 'jpg');
-        }
-        else return error(); //有type但不为302或json时返回错误
-      }
-      else return error(); //不指定device不允许指定id
+        selectedDevice = availableDevices[Math.floor(Math.random() * availableDevices.length)];
     }
-    else return error();
+
+    if (!selectedList[selectedDevice]) {
+        return error(`Device '${selectedDevice}' not found in category '${category}'`);
+    }
+    
+    const values = selectedList[selectedDevice];
+
+    let trueId;
+    let img;
+
+    if (searchParams.has('id')) {
+        let reqId = parseInt(id);
+        if (isNaN(reqId) || reqId < 1 || reqId > values.length) {
+            return error("ID out of range");
+        }
+        trueId = reqId - 1;
+        img = values[trueId];
+    } else {
+        trueId = Math.floor(Math.random() * values.length);
+        img = values[trueId];
+    }
+
+    if (type === '302') {
+      return redirect(trueId + 1, img, category, selectedDevice, returnForm, request);
+    } 
+    else if (type === 'json') {
+      return typejson(trueId + 1, img, category, selectedDevice, returnForm, request);
+    } 
+    else if (!type) {
+      return image(img, returnForm);
+    } 
+    else {
+      return error("Invalid type parameter");
+    }
+
+  } else {
+    return error("No category specified");
   }
-  else return error(); //cat为必须，没有则抛出错误
 }
 
 
+function smartEncodePath(path) {
+    return path.split('/').map(part => encodeURIComponent(part)).join('/');
+}
+
 function image(img, returnForm) {
-  let encodedImg = encodeURIComponent(img);
+  let encodedImg = smartEncodePath(img);
+  
   let contentType = returnForm === 'jpg' ? 'image/jpeg' : `image/${returnForm}`;
+  
   let imgUrl = imgHost + returnForm + "/" + encodedImg + "." + returnForm;
+  
   let getimg = new Request(imgUrl);
   return fetch(getimg, {
     headers: {
-      'content-type': contentType
+      'content-type': contentType,
+      'cache-control': 'max-age=0, s-maxage=0',
+      'Cloudflare-CDN-Cache-Control': 'max-age=0',
+      'CDN-Cache-Control': 'max-age=0'
     },
   });  
 }
 
-
-function redirect(id, img, category, device, request) {
+function redirect(id, img, category, device, returnForm, request) {
   let nowUrl = new URL(request.url);
-  let searchParams = new URLSearchParams(nowUrl.search);
-  let returnForm = searchParams.get('form');
-  if (!searchParams.has('form')) {returnForm = "jpg";}
-//  let encodedImg = encodeURIComponent(img);
+  let encodedImg = smartEncodePath(img); // 修复 redirect 中的路径编码问题
+  
+  // 构造最终文件名路径
+  let fileUrlPath = returnForm + "/" + encodedImg + "." + returnForm;
+
   if (redirectProxy === 0) {
-    const redirectUrl = imgHost + returnForm + "/" + img + "." + returnForm;
-    return type302(redirectUrl);
+    return type302(imgHost + fileUrlPath);
   }
   else if (redirectProxy === 1) {
     const myHost = nowUrl.hostname;
     let redirectUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm;
-	if (!searchParams.has('form')) {redirectUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id;}
     return type302(redirectUrl);
   }
   else if (redirectProxy === 2) {
-    const redirectUrl = ghproxyUrl + imgHost + returnForm + "/" + img + "." + returnForm;
-    return type302(redirectUrl);
+    return type302(ghproxyUrl + imgHost + fileUrlPath);
   }
-  else return error();
-  
+  else return error("Redirect Config Error");
 }
-
 
 function type302(redirectUrl) {
   return new Response("", {
     status: 302,
-    headers: {
-      Location: redirectUrl
-    }
+    headers: { Location: redirectUrl }
   });
 }
 
-
-function typejson(id, img, category, device, request) {
+function typejson(id, img, category, device, returnForm, request) {
   let nowUrl = new URL(request.url);
-  let searchParams = new URLSearchParams(nowUrl.search);
-  let returnForm = searchParams.get('form');
-  if (!searchParams.has('form')) {returnForm = "jpg";}
   let myHost = nowUrl.hostname;
-	let githubUrl = imgHost + returnForm + "/" + img + "." + returnForm;
-	let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm;
-	if (!searchParams.has('form')) {workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id;}
-	let proxyUrl = ghproxyUrl + imgHost + returnForm + "/" + img + "." + returnForm;
-	return new Response(
+  let encodedImg = smartEncodePath(img); // 修复 JSON 中的路径编码问题
+
+  let fileUrlPath = returnForm + "/" + encodedImg + "." + returnForm;
+
+  let githubUrl = imgHost + fileUrlPath;
+  let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm;
+  let proxyUrl = ghproxyUrl + imgHost + fileUrlPath;
+
+  return new Response(
     JSON.stringify({
       "category": category,
       "device": device,
       "id": id,
+      "form": returnForm,
       "githubUrl": githubUrl,
       "workerUrl": workerUrl,
       "proxyUrl": proxyUrl
     }, null, 2), {
-    headers: {
-      'Content-Type': 'application/json'
-    }
+    headers: { 'Content-Type': 'application/json' }
   });
-
 }
 
 
-async function error() {
-  let response = await fetch(url404);
-  response = new Response(response.body, {
+async function error(reason = "Unknown Error") {
+  let htmlContent = "";
+  let isFallback = false;
+
+  try {
+    const response = await fetch(url404);
+    if (response.ok) {
+      htmlContent = await response.text();
+    } else {
+      throw new Error("404 Template Fetch Failed");
+    }
+  } catch (e) {
+    isFallback = true;
+    htmlContent = `
+    <!DOCTYPE html>
+    <html><head><title>404 Not Found</title></head>
+    <body style="text-align:center; padding:50px; font-family:sans-serif;">
+      <h1>404 Not Found</h1>
+      <p>Could not find the requested image.</p>
+      <div style="color:red; border:1px solid #ccc; display:inline-block; padding:10px;">
+        Debug: ${reason}
+      </div>
+    </body></html>`;
+  }
+
+  return new Response(htmlContent, {
       status: 404,
       statusText: 'Not Found',
-      headers: { 'Content-Type': 'text/html' }
+      headers: { 
+          'Content-Type': 'text/html',
+          'X-Error-Reason': reason 
+      }
   });
-  return response
 }
-
 
 async function index() {
   let response = await fetch(urlIndex);
-  response = new Response(response.body, {
+  return new Response(response.body, {
       status: 200,
-      statusText: 'OK',
       headers: { 'Content-Type': 'text/html' }
   });
-  return response
 }

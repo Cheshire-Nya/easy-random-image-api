@@ -8,8 +8,8 @@
 		"10"
       ],
       "pc": [
-	    "demoimg/aa",
-        "demoimg/bb"
+	    "demoimg/1",
+        "demoimg/2"
       ]
     },
     "category2": {
@@ -21,9 +21,9 @@
 		"9"
       ],
       "pc": [
-        "demoimg/cc",
-        "demoimg/dd",
-        "demoimg/ee"
+        "demoimg/5",
+        "demoimg/4",
+        "demoimg/3"
       ]
     }
 }
