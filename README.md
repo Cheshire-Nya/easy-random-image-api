@@ -1,5 +1,7 @@
 # easy-random-img-api
 
+请移步[方案5](https://github.com/Cheshire-Nya/easy-random-image-api/tree/main/%E6%96%B9%E6%A1%885)
+<!--
 ## 简介
 
 白嫖Github仓库和Cloudflare Workers简单快捷实现可分类的随机图片抽取
@@ -122,17 +124,7 @@ PS：
 }
 ```
 
-<!--
-### 举个栗子
 
-我希望在[Cheshire-Nya/random-genshin-img](https://github.com/Cheshire-Nya/random-genshin-img)仓库下`纳西妲`文件夹下的35张图片中抽取，那么worker.js中：
-
-[Line5](https://github.com/Cheshire-Nya/easy-random-img-api/blob/5fd71f5a549ab6e5ea8240a15891299bac9a89a2/worker.js#L5)就应该是`var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/random-genshin-img/main";`
-
-[Line17](https://github.com/Cheshire-Nya/easy-random-img-api/blob/5fd71f5a549ab6e5ea8240a15891299bac9a89a2/worker.js#L17)应为`if (imgPath == '/%E7%BA%B3%E8%A5%BF%E5%A6%B2') { max=35;}`
-
-访问时应使用的链接为`https://<worker域名>/api/纳西妲`
--->
 
 ## PS
 
