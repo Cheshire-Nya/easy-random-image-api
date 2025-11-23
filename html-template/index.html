@@ -411,7 +411,7 @@
             const glitchContainer = document.getElementById('glitch-container');
             const staticImageEl = document.getElementById('static-image');
 
-            const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 3000));
+            const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 5000));
 
             try {
                 const res = await fetch('/api?type=json&q=60');
