@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(30, 30, 30, 0.6);
+            --glass-bg: rgba(30, 30, 30, 0.5);
             --glass-border: rgba(255, 255, 255, 0.1);
             --text-color: #ffffff;
             --text-secondary: #cbd5e0;
@@ -74,6 +74,76 @@
             transition: opacity 0.6s ease-in; 
         }
 
+        #ui-toggle-btn {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0;
+        }
+        
+        #ui-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.8); 
+            
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        #ui-toggle-btn.is-active {
+            background: rgba(0, 0, 0, 0.6);
+        }
+        
+        #ui-toggle-btn.is-active:hover {
+            background: rgba(0, 0, 0, 0.9); 
+        }
+
+        .hamburger {
+            position: relative;
+            width: 20px;
+            height: 16px;
+        }
+
+        .hamburger span {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--text-color);
+            border-radius: 2px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+
+        .hamburger span:nth-child(1) { top: 0; }
+        .hamburger span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+        .hamburger span:nth-child(3) { bottom: 0; }
+
+        #ui-toggle-btn.is-active .hamburger span:nth-child(1) {
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+        #ui-toggle-btn.is-active .hamburger span:nth-child(2) {
+            opacity: 0;
+            transform: translateX(10px);
+        }
+
+        #ui-toggle-btn.is-active .hamburger span:nth-child(3) {
+            bottom: 50%;
+            transform: translateY(50%) rotate(-45deg);
+        }
+
         .container {
             position: relative;
             z-index: 10;
@@ -86,18 +156,19 @@
             max-width: 900px;
             width: 100%;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            animation: fadeInUp 0.8s ease-out;
             text-align: center;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: scale(1) translateY(0);
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .container.hidden {
+            opacity: 0;
+            transform: scale(0.95) translateY(-20px);
+            pointer-events: none;
         }
 
-        header { 
-            margin-bottom: 1rem; 
-        }
+        header { margin-bottom: 1rem; }
         h1 { font-size: 2.2rem; margin: 0 0 0.5rem 0; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         p.subtitle { color: var(--text-secondary); margin: 0; font-size: 1rem; margin-bottom: 1.5rem; }
 
@@ -138,12 +209,7 @@
             transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in-out, margin-top 0.3s;
             margin-top: 0;
         }
-        
-        #docs-section.expanded {
-            max-height: 800px;
-            opacity: 1;
-            margin-top: 2rem;
-        }
+        #docs-section.expanded { max-height: 800px; opacity: 1; margin-top: 2rem; }
 
         .table-wrapper { 
             overflow-x: auto; 
@@ -242,7 +308,15 @@
         <div id="static-image"></div>
     </div>
 
-    <div class="container">
+    <button id="ui-toggle-btn" class="is-active" title="切换界面显示">
+        <div class="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+
+    <div class="container" id="main-ui">
         <header>
             <h1>Easy Random Image API</h1>
             <p class="subtitle">基于 Cloudflare Workers 的全功能随机图片服务</p>
@@ -324,6 +398,14 @@
             }
         }
 
+        const uiToggleBtn = document.getElementById('ui-toggle-btn');
+        const mainUI = document.getElementById('main-ui');
+        
+        uiToggleBtn.addEventListener('click', () => {
+            mainUI.classList.toggle('hidden');
+            uiToggleBtn.classList.toggle('is-active');
+        });
+
         (async function() {
             const gradientEl = document.getElementById('default-gradient');
             const glitchContainer = document.getElementById('glitch-container');
@@ -332,7 +414,7 @@
             const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 3000));
 
             try {
-                const res = await fetch('/api?type=json');
+                const res = await fetch('/api?type=json&q=60');
                 if (!res.ok) throw new Error('API Request failed');
                 const data = await res.json();
                 const imgUrl = data.proxyUrl || data.workerUrl;
