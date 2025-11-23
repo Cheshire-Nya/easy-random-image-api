@@ -49,9 +49,7 @@ addEventListener('fetch', event => {
 
 async function handleRequest(request) {
   if (request.method === "OPTIONS") {
-    return new Response(null, {
-      headers: corsHeaders
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   let nowUrl = new URL(request.url);
@@ -147,19 +145,18 @@ async function extractSearch(urlSearch, request) {
   }
 
   if (type === '302') {
-    return redirect(trueId + 1, img, category, selectedDevice, returnForm, request);
+    return redirect(trueId + 1, img, category, selectedDevice, returnForm, request, searchParams);
   } 
   else if (type === 'json') {
-    return typejson(trueId + 1, img, category, selectedDevice, returnForm, request);
+    return typejson(trueId + 1, img, category, selectedDevice, returnForm, request, searchParams);
   } 
   else if (!type) {
-    return image(img, returnForm, category, selectedDevice);
+    return image(img, returnForm, category, selectedDevice, searchParams);
   } 
   else {
     return error("Invalid type parameter");
   }
 }
-
 
 function getDeviceType(request) {
   const ua = request.headers.get('User-Agent') || "";
@@ -168,34 +165,47 @@ function getDeviceType(request) {
   return "pc";
 }
 
-
 function smartEncodePath(path) {
     return path.split('/').map(part => encodeURIComponent(part)).join('/');
 }
 
+function getExtraQueryString(searchParams) {
+    let str = "";
+    const systemParams = ['cat', 'device', 'type', 'id', 'form'];
+    
+    for (const [key, value] of searchParams) {
+        if (!systemParams.includes(key)) {
+            str += `&${key}=${encodeURIComponent(value)}`;
+        }
+    }
+    return str;
+}
 
 function getGithubSourceUrl(img, returnForm) {
-  let encodedImg = smartEncodePath(img);
-  if (imgResize === 1 && returnForm !== 'jpg') {
-      return imgHost + "jpg/" + encodedImg + ".jpg";
-  }
-  return imgHost + returnForm + "/" + encodedImg + "." + returnForm;
+    let encodedImg = smartEncodePath(img);
+    if (imgResize === 1 && returnForm !== 'jpg') {
+        return imgHost + "jpg/" + encodedImg + ".jpg";
+    }
+    return imgHost + returnForm + "/" + encodedImg + "." + returnForm;
 }
 
+function getCdnProxyUrl(githubUrl, returnForm, searchParams) {
+    let url = resizeHost + githubUrl;
+    
+    if (imgResize === 1 && returnForm !== 'jpg') {
+        url += "&output=" + returnForm;
+    }
 
-function getCdnProxyUrl(githubUrl, returnForm) {
-  let url = resizeHost + githubUrl;
-  
-  if (imgResize === 1 && returnForm !== 'jpg') {
-      url += "&output=" + returnForm;
-  }
-  return url;
+    if (searchParams) {
+        url += getExtraQueryString(searchParams);
+    }
+
+    return url;
 }
 
-
-async function image(img, returnForm, category, device) {
+async function image(img, returnForm, category, device, searchParams) {
   let githubUrl = getGithubSourceUrl(img, returnForm);
-  let fetchUrl = getCdnProxyUrl(githubUrl, returnForm);
+  let fetchUrl = getCdnProxyUrl(githubUrl, returnForm, searchParams);
   let contentType = returnForm === 'jpg' ? 'image/jpeg' : `image/${returnForm}`;
   
   let response = await fetch(fetchUrl, {
@@ -219,7 +229,7 @@ async function image(img, returnForm, category, device) {
   newHeaders.set('Access-Control-Allow-Origin', '*');
   newHeaders.set('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
   newHeaders.set('Access-Control-Allow-Headers', '*');
-
+  
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -227,37 +237,38 @@ async function image(img, returnForm, category, device) {
   });  
 }
 
-
-function redirect(id, img, category, device, returnForm, request) {
+function redirect(id, img, category, device, returnForm, request, searchParams) {
   let nowUrl = new URL(request.url);
-  
   let githubUrl = getGithubSourceUrl(img, returnForm);
-  
   let targetUrl = "";
 
+  let extraQuery = getExtraQueryString(searchParams);
+
   if (redirectProxy === 0) {
-    targetUrl = githubUrl;
+    targetUrl = githubUrl; 
   }
   else if (redirectProxy === 1) {
     const myHost = nowUrl.hostname;
-    targetUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm;
+    targetUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm + extraQuery;
   }
   else if (redirectProxy === 2) {
-    targetUrl = getCdnProxyUrl(githubUrl, returnForm);
+    targetUrl = getCdnProxyUrl(githubUrl, returnForm, searchParams);
   }
   else return error("Redirect Config Error");
 
   return type302(targetUrl);
 }
 
-
-function typejson(id, img, category, device, returnForm, request) {
+function typejson(id, img, category, device, returnForm, request, searchParams) {
   let nowUrl = new URL(request.url);
   let myHost = nowUrl.hostname;
   let githubUrl = getGithubSourceUrl(img, returnForm);
   
-  let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm;
-  let proxyUrl = getCdnProxyUrl(githubUrl, returnForm);
+  let extraQuery = getExtraQueryString(searchParams);
+
+  let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm + extraQuery;
+  
+  let proxyUrl = getCdnProxyUrl(githubUrl, returnForm, searchParams);
 
   return new Response(
     JSON.stringify({
@@ -276,14 +287,12 @@ function typejson(id, img, category, device, returnForm, request) {
   });
 }
 
-
 function type302(redirectUrl) {
   return new Response("", {
     status: 302,
     headers: { Location: redirectUrl }
   });
 }
-
 
 async function error(reason = "Unknown Error") {
   let htmlContent = "";
@@ -293,9 +302,7 @@ async function error(reason = "Unknown Error") {
     const response = await fetch(url404);
     if (response.ok) {
       htmlContent = await response.text();
-    } else {
-      throw new Error("404 Template Fetch Failed");
-    }
+    } else { throw new Error("404 Template Fetch Failed"); }
   } catch (e) {
     isFallback = true;
     htmlContent = `
@@ -306,55 +313,13 @@ async function error(reason = "Unknown Error") {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>404 Not Found (Fallback)</title>
       <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --text-color: #ffffff;
-            --text-secondary: #e2e8f0;
-            --box-bg: rgba(0, 0, 0, 0.2);
-        }
-        body {
-          margin: 0;
-          font-family: system-ui, -apple-system, sans-serif;
-          background: var(--bg-gradient);
-          color: var(--text-color);
-          height: 100vh;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-        }
-        .container {
-          background: var(--glass-bg);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border: 1px solid var(--glass-border);
-          border-radius: 16px;
-          padding: 3rem;
-          max-width: 500px;
-          width: 90%;
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
+        :root { --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); --glass-bg: rgba(255, 255, 255, 0.1); --glass-border: rgba(255, 255, 255, 0.2); --text-color: #ffffff; --text-secondary: #e2e8f0; --box-bg: rgba(0, 0, 0, 0.2); }
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg-gradient); color: var(--text-color); height: 100vh; display: flex; justify-content: center; align-items: center; text-align: center; }
+        .container { background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 3rem; max-width: 500px; width: 90%; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); }
         h1 { margin: 0 0 1rem; font-size: 3rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         p { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
-        .debug-box {
-          background: var(--box-bg);
-          padding: 1rem;
-          border-radius: 8px;
-          text-align: left;
-          font-size: 0.9rem;
-          border: 1px solid var(--glass-border);
-        }
-        .tag {
-          display: inline-block;
-          background: #e53e3e;
-          color: white;
-          padding: 2px 6px;
-          border-radius: 4px;
-          font-size: 0.75rem;
-          margin-bottom: 0.5rem;
-        }
+        .debug-box { background: var(--box-bg); padding: 1rem; border-radius: 8px; text-align: left; font-size: 0.9rem; border: 1px solid var(--glass-border); }
+        .tag { display: inline-block; background: #e53e3e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 0.5rem; }
         code { font-family: monospace; color: #feb2b2; }
       </style>
     </head>
@@ -362,15 +327,12 @@ async function error(reason = "Unknown Error") {
       <div class="container">
         <h1>404</h1>
         <p>无法找到请求的资源。</p>
-        
         <div class="debug-box">
           <span class="tag">Fallback Mode</span><br>
           <strong>Error Reason:</strong><br>
           <code>${reason}</code>
           <br><br>
-          <small style="color: #cbd5e0;">
-            (注意: 404模板加载失败，您正在查看内置备用页面。)
-          </small>
+          <small style="color: #cbd5e0;">(注意: 404模板加载失败，您正在查看内置备用页面。)</small>
         </div>
       </div>
     </body>
@@ -378,19 +340,16 @@ async function error(reason = "Unknown Error") {
     `;
   }
 
-
   return new Response(htmlContent, {
-    status: 404,
-    statusText: 'Not Found',
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'X-Error-Reason': reason,
-      'X-Error-Fallback': isFallback ? 'true' : 'false',
-      ...corsHeaders 
-    }
+      status: 404,
+      headers: { 
+          'Content-Type': 'text/html; charset=utf-8', 
+          'X-Error-Reason': reason,
+          'X-Error-Fallback': isFallback ? 'true' : 'false',
+          ...corsHeaders
+      }
   });
 }
-
 
 async function index() {
   let response = await fetch(urlIndex);
