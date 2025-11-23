@@ -46,11 +46,7 @@ async function handleRequest(request) {
   let urlSearch = nowUrl.search;
 
   if (nowUrl.pathname === '/api' || nowUrl.pathname === '/api/') {
-    if (urlSearch) {
-      return extractSearch(urlSearch, request);
-    } else {
-      return error("No search parameters");
-    }
+    return extractSearch(urlSearch, request);
   } else if (nowUrl.pathname === '/') {
     return index();
   } else {
@@ -72,92 +68,96 @@ async function extractSearch(urlSearch, request) {
     return error("Invalid image format: " + returnForm);
   }
 
+  const response = await fetch(jsonUrl);
+  if (!response.ok) return error("Failed to fetch JSON config");
+  
+  const imgList = await response.json();
+  let availableCategories = Object.keys(imgList);
+
+  let candidateCats = [];
   if (cats && cats.length > 0) {
-    const response = await fetch(jsonUrl);
-    if (!response.ok) return error("Failed to fetch JSON config");
-    
-    const imgList = await response.json();
-    let availableCategories = Object.keys(imgList);
-
-    if (!cats.every(cat => availableCategories.includes(cat))) {
-      return error("Category not found");
-    }
-
-    const category = cats[Math.floor(Math.random() * cats.length)];
-    const selectedList = imgList[category];
-
-    let selectedDevice = device;
-    let values = [];
-    let isMixedPool = false;
-
-    if (selectedDevice === 'invalid') {
-        isMixedPool = true;
-        for (let devKey in selectedList) {
-            let imgs = selectedList[devKey];
-            if (Array.isArray(imgs)) {
-                imgs.forEach(imgItem => {
-                    values.push({ i: imgItem, d: devKey });
-                });
-            }
-        }
-        
-        if (values.length === 0) return error("Category is empty");
-    } 
-    else {
-        if (!selectedDevice) selectedDevice = getDeviceType(request);
-        
-        if (!selectedList[selectedDevice]) {
-            if (selectedDevice === 'mobile' && selectedList['pc']) selectedDevice = 'pc';
-            else if (selectedDevice === 'pc' && selectedList['mobile']) selectedDevice = 'mobile';
-            else return error(`Device '${selectedDevice}' data missing`);
-        }
-        values = selectedList[selectedDevice];
-    }
-
-    let trueId;
-    let img;
-
-    if (searchParams.has('id')) {
-        let reqId = parseInt(id);
-        if (isNaN(reqId) || reqId < 1 || reqId > values.length) return error("ID out of range");
-        trueId = reqId - 1;
-    } else {
-        trueId = Math.floor(Math.random() * values.length);
-    }
-
-    let rawItem = values[trueId];
-
-    if (isMixedPool) {
-        img = rawItem.i;
-        selectedDevice = rawItem.d;
-    } else {
-        img = rawItem;
-    }
-
-    if (type === '302') {
-      return redirect(trueId + 1, img, category, selectedDevice, returnForm, request);
-    } 
-    else if (type === 'json') {
-      return typejson(trueId + 1, img, category, selectedDevice, returnForm, request);
-    } 
-    else if (!type) {
-      return image(img, returnForm, category, selectedDevice);
-    } 
-    else {
-      return error("Invalid type parameter");
-    }
-
+      if (!cats.every(cat => availableCategories.includes(cat))) {
+          return error("Category not found");
+      }
+      candidateCats = cats;
   } else {
-    return error("No category specified");
+      candidateCats = availableCategories;
+  }
+
+  const category = candidateCats[Math.floor(Math.random() * candidateCats.length)];
+  const selectedList = imgList[category];
+
+  let selectedDevice = device;
+  let values = [];
+  let isMixedPool = false;
+
+  if (selectedDevice === 'invalid') {
+      isMixedPool = true;
+      for (let devKey in selectedList) {
+          let imgs = selectedList[devKey];
+          if (Array.isArray(imgs)) {
+              imgs.forEach(imgItem => {
+                  values.push({ i: imgItem, d: devKey });
+              });
+          }
+      }
+      if (values.length === 0) return error("Category is empty");
+  } 
+  else {
+      if (!selectedDevice) selectedDevice = getDeviceType(request);
+      
+      if (!selectedList[selectedDevice]) {
+          if (selectedDevice === 'mobile' && selectedList['pc']) selectedDevice = 'pc';
+          else if (selectedDevice === 'pc' && selectedList['mobile']) selectedDevice = 'mobile';
+          else return error(`Device '${selectedDevice}' data missing`);
+      }
+      values = selectedList[selectedDevice];
+  }
+
+  let trueId;
+  let img;
+
+  if (searchParams.has('id')) {
+      let reqId = parseInt(id);
+      if (isNaN(reqId) || reqId < 1 || reqId > values.length) return error("ID out of range");
+      trueId = reqId - 1;
+  } else {
+      trueId = Math.floor(Math.random() * values.length);
+  }
+
+  let rawItem = values[trueId];
+
+  if (isMixedPool) {
+      img = rawItem.i;
+      selectedDevice = rawItem.d; 
+  } else {
+      img = rawItem;
+  }
+
+  if (type === '302') {
+    return redirect(trueId + 1, img, category, selectedDevice, returnForm, request);
+  } 
+  else if (type === 'json') {
+    return typejson(trueId + 1, img, category, selectedDevice, returnForm, request);
+  } 
+  else if (!type) {
+    return image(img, returnForm, category, selectedDevice);
+  } 
+  else {
+    return error("Invalid type parameter");
   }
 }
 
+
 function getDeviceType(request) {
   const ua = request.headers.get('User-Agent') || "";
+  // ===============自动判断设备在这修改===================
   const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  // ===========================================================
   if (mobileRegex.test(ua)) return "mobile";
   return "pc";
 }
+
 
 function smartEncodePath(path) {
     return path.split('/').map(part => encodeURIComponent(part)).join('/');
@@ -174,7 +174,9 @@ function getGithubSourceUrl(img, returnForm) {
 
 
 function getCdnProxyUrl(githubUrl, returnForm) {
-  let url = resizeHost + encodeURIComponent(githubUrl);
+
+  let url = resizeHost + githubUrl;
+  
   if (imgResize === 1 && returnForm !== 'jpg') {
       url += "&output=" + returnForm;
   }
@@ -184,10 +186,25 @@ function getCdnProxyUrl(githubUrl, returnForm) {
 
 async function image(img, returnForm, category, device) {
   let githubUrl = getGithubSourceUrl(img, returnForm);
-  let fetchUrl = getCdnProxyUrl(githubUrl, returnForm);
+  
+  let fetchUrl = resizeHost + githubUrl;
+  
+  if (imgResize === 1 && returnForm !== 'jpg') {
+      fetchUrl += "&output=" + returnForm;
+  }
+
   let contentType = returnForm === 'jpg' ? 'image/jpeg' : `image/${returnForm}`;
   
-  let response = await fetch(fetchUrl);
+  let response = await fetch(fetchUrl, {
+      headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Referer": "https://github.com/"
+      }
+  });
+
+  if (!response.ok) {
+      return error(`CDN Error: ${response.status}`);
+  }
 
   let newHeaders = new Headers(response.headers);
   newHeaders.set('Content-Type', contentType);
@@ -202,7 +219,6 @@ async function image(img, returnForm, category, device) {
     headers: newHeaders
   });  
 }
-
 
 function redirect(id, img, category, device, returnForm, request) {
   let nowUrl = new URL(request.url);
