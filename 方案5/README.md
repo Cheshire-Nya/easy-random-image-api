@@ -62,77 +62,55 @@ var availableDevices = ["mobile", "pc"];
 
 ### 调用参数
 
-<table border="1" cellspacing="0" cellpadding="10" style="border-collapse: collapse; width: 100%; font-family: sans-serif;">
+<table>
   <thead>
-    <tr style="background-color: #f3f4f6; text-align: left;">
-      <th style="width: 15%;">参数 (Param)</th>
-      <th style="width: 20%;">值 (Value)</th>
-      <th>说明 (Description)</th>
+    <tr>
+      <th width="15%">参数</th>
+      <th width="20%">值</th>
+      <th>说明</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td align="center"><strong>cat</strong><br><small style="color:red">(必填)</small></td>
-      <td align="center"><code>JSON Key</code></td>
-      <td>指定分类名称（需与 JSON 配置文件中的 Key 一致）。</td>
-    </tr>
-    <tr>
-      <td align="center" rowspan="3"><strong>type</strong><br><small>(可选)</small></td>
-      <td align="center"><code>302</code></td>
+      <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>JSON Key</code></td>
       <td>
-        <strong>跳转模式：</strong>返回 302 重定向到图片真实地址。<br>
-        适用于 <code>background-image</code> 或直接通过 URL 引用图片的场景。
+        指定分类名称。<br>
+        <span class="tag-tip">留空则在所有分类中随机抽取。</span>
       </td>
     </tr>
     <tr>
-      <td align="center"><code>json</code></td>
+      <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>pc</code><br><code>mobile</code><br><code>invalid</code></td>
       <td>
-        <strong>API 模式：</strong>返回包含图片直链、CDN 链接、设备类型等元数据的 JSON 对象。
+        <strong>pc/mobile</strong>: 强制指定设备。<br>
+        <strong>invalid</strong>: 全池随机模式 (混合所有设备图)。<br>
+        <span class="tag-tip">留空则根据 User-Agent 自动判断。</span>
       </td>
     </tr>
     <tr>
-      <td align="center"><i>(留空)</i></td>
+      <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>302</code><br><code>json</code><br><code>(空)</code></td>
       <td>
-        <strong>直出模式：</strong>直接返回二进制图片数据流（默认为此模式）。
+        <strong>302</strong>: 跳转到图片真实地址 (默认)。<br>
+        <strong>json</strong>: 返回包含元数据的 JSON。<br>
+        <strong>(空)</strong>: 直接返回图片数据流。
       </td>
     </tr>
     <tr>
-      <td align="center" rowspan="4"><strong>device</strong><br><small>(可选)</small></td>
-      <td align="center"><code>pc</code></td>
-      <td>强制抽取 <strong>PC 端</strong> 列表中的图片。</td>
-    </tr>
-    <tr>
-      <td align="center"><code>mobile</code></td>
-      <td>强制抽取 <strong>移动端</strong> 列表中的图片。</td>
-    </tr>
-    <tr>
-      <td align="center"><code>invalid</code></td>
+      <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>Integer</code></td>
       <td>
-        <strong>全池随机模式：</strong>无视设备类型，在该分类下所有图片中随机抽取。<br>
-        <em>(注意：此模式下返回的 JSON 或 Header 中会包含真实的设备归属)</em>
+        获取第 N 张图片。<br>
+        <span class="tag-warn">⚠️ 建议配合 device 参数使用以确保顺序固定。</span>
       </td>
     </tr>
     <tr>
-      <td align="center"><i>(留空)</i></td>
+      <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>webp</code> / <code>jpg</code></td>
       <td>
-        <strong>智能判断模式：</strong>根据请求头的 <code>User-Agent</code> 自动判断设备。<br>
-        <span style="color: #d9534f; font-size: 0.9em;">⚠️ 注意：自动判断模式下，无法使用 <code>id</code> 参数。</span>
-      </td>
-    </tr>
-    <tr>
-      <td align="center"><strong>id</strong><br><small>(可选)</small></td>
-      <td align="center"><code>数值 (Integer)</code></td>
-      <td>
-        指定获取第 N 张图片（从 1 开始排序）。<br>
-        <span style="color: #d9534f; font-size: 0.9em;">⚠️ 必须同时明确指定 <code>device</code> 参数（pc/mobile）才生效。</span>
-      </td>
-    </tr>
-    <tr>
-      <td align="center"><strong>form</strong><br><small>(可选)</small></td>
-      <td align="center"><code>webp</code> / <code>jpg</code></td>
-      <td>
-        指定返回的图片格式。<br>
-        默认为 <code>jpg</code>。如指定为 <code>webp</code>，程序将尝试返回 WebP 版本（支持自动转码）。
+        指定返回格式。<br>
+        默认为 jpg。如指定 webp，系统会自动通过 CDN 转码。
       </td>
     </tr>
   </tbody>
