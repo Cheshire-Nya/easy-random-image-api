@@ -74,43 +74,34 @@ var availableDevices = ["mobile", "pc"];
     <tr>
       <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
       <td><code>JSON Key</code></td>
-      <td>
-        指定分类名称。<br>
-        <span class="tag-tip">留空则在所有分类中随机抽取。</span>
-      </td>
+      <td>指定分类。<span class="tag-tip">留空则随机全分类。</span></td>
     </tr>
     <tr>
       <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>pc</code><br><code>mobile</code><br><code>invalid</code></td>
-      <td>
-        <strong>pc/mobile</strong>: 强制指定设备。<br>
-        <strong>invalid</strong>: 全池随机模式 (混合所有设备图)。<br>
-        <span class="tag-tip">留空则根据 User-Agent 自动判断。</span>
-      </td>
+      <td><code>pc/mobile</code><br><code>invalid</code></td>
+      <td><strong>invalid</strong>: 全池随机。<span class="tag-tip">留空自动判断设备。</span></td>
     </tr>
     <tr>
       <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>302</code><br><code>json</code><br><code>(空)</code></td>
-      <td>
-        <strong>302</strong>: 跳转到图片真实地址 (默认)。<br>
-        <strong>json</strong>: 返回包含元数据的 JSON。<br>
-        <strong>(空)</strong>: 直接返回图片数据流。
-      </td>
+      <td><code>302</code><br><code>json</code></td>
+      <td><strong>json</strong>: 返回元数据。<br><strong>(空)</strong>: 直接返回图片。</td>
     </tr>
     <tr>
       <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>数值</code></td>
-      <td>
-        获取第 N 张图片。<br>
-        <span class="tag-warn">⚠️ 建议配合 device 参数使用以确保顺序固定。</span>
-      </td>
+      <td><code>Integer</code></td>
+      <td>获取第 N 张图。<span class="tag-warn">⚠️ 建议配合 device 使用。</span></td>
     </tr>
     <tr>
       <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>webp</code> / <code>jpg</code></td>
+      <td><code>webp/jpg</code></td>
+      <td>指定格式 (支持自动转码)。</td>
+    </tr>
+    <tr>
+      <td><strong>CDN参数</strong><br><span class="tag tag-opt">透传</span></td>
+      <td><code>w</code>, <code>h</code>, <code>q</code>...</td>
       <td>
-        指定返回格式。<br>
-        默认为 jpg。如指定 webp，系统会自动通过 CDN 转码。
+        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的所有参数。<br>
+        例: <code>w=200</code> (宽200), <code>q=80</code> (质量80)
       </td>
     </tr>
   </tbody>
@@ -119,6 +110,8 @@ var availableDevices = ["mobile", "pc"];
 ### 示例
 
 [https://demo5.randomimg.sfacg.ltd](https://demo5.randomimg.sfacg.ltd)主页
+
+[https://demo5.randomimg.sfacg.ltd/api?filt=greyscale](https://demo5.randomimg.sfacg.ltd/api?filt=greyscale)输出黑白滤镜【在使用cdn代理图片时】
 
 [https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)不带参数自动判断设备无视分类抽取
 

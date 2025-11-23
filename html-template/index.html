@@ -234,12 +234,12 @@
                     <tr>
                       <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
                       <td><code>JSON Key</code></td>
-                      <td>指定分类名称。<span class="tag-tip">留空则在所有分类中随机抽取。</span></td>
+                      <td>指定分类。<span class="tag-tip">留空则随机全分类。</span></td>
                     </tr>
                     <tr>
                       <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
                       <td><code>pc/mobile</code><br><code>invalid</code></td>
-                      <td><strong>invalid</strong>: 全池随机模式。<span class="tag-tip">留空则自动判断设备。</span></td>
+                      <td><strong>invalid</strong>: 全池随机。<span class="tag-tip">留空自动判断设备。</span></td>
                     </tr>
                     <tr>
                       <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
@@ -249,12 +249,20 @@
                     <tr>
                       <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
                       <td><code>数值N</code></td>
-                      <td>获取第 N 张图片。<span class="tag-warn">⚠️ 建议配合 device 使用。</span></td>
+                      <td>获取第 N 张图。<span class="tag-warn">⚠️ 建议配合 device 使用。</span></td>
                     </tr>
                     <tr>
                       <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
                       <td><code>webp/jpg</code></td>
-                      <td>指定格式 (支持 CDN 自动转码)。</td>
+                      <td>指定格式 (支持自动转码)。</td>
+                    </tr>
+                    <tr>
+                      <td><strong>CDN参数</strong><br><span class="tag tag-opt">透传</span></td>
+                      <td><code>w</code>, <code>h</code>, <code>q</code>...</td>
+                      <td>
+                        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的参数。<br>
+                        例: <code>w=200</code>, <code>q=80</code>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
