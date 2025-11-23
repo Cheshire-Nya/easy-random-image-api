@@ -62,53 +62,80 @@ var availableDevices = ["mobile", "pc"];
 
 ### 调用参数
 
-<table>
-<thead>
-  <tr>
-    <th>可用参数</th>
-    <th>值</th>
-    <th>说明</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td align="center">cat</td>
-    <td align="center">json文件中的key</td>
-    <td>在该分类中抽取图片</td>
-  </tr>
-  <tr>
-    <td align="center" rowspan="2">type</td>
-    <td align="center">302<br>(有id参数时不应type=302)</td>
-    <td>通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等</td>
-  </tr>
+<table border="1" cellspacing="0" cellpadding="10" style="border-collapse: collapse; width: 100%; font-family: sans-serif;">
+  <thead>
+    <tr style="background-color: #f3f4f6; text-align: left;">
+      <th style="width: 15%;">参数 (Param)</th>
+      <th style="width: 20%;">值 (Value)</th>
+      <th>说明 (Description)</th>
+    </tr>
+  </thead>
+  <tbody>
     <tr>
-    <td align="center">json</td>
-    <td>以json格式返回</td>
-  </tr>
-  <tr>
-    <td align="center" rowspan="2">device<br>(不指定device时会由函数来判断设备类型)<br>(这时不允许使用id参数)</td>
-    <td align="center">pc</td>
-    <td>返回适合pc的图片</td>
-  </tr>
-  <tr>
-    <td align="center">mobile</td>
-    <td>返回适合移动端的图片</td>
-  </tr>
-  <tr>
-    <td align="center">invalid</td>
-    <td>禁用设备判断全池随机抽取</td>
-  </tr>
-  <tr>
-    <td align="center">id</td>
-    <td align="center">&lt;数值&gt;</td>
-    <td>需要和cat参数配合<br>返回排序为第&lt;数值&gt;张的指定图片</td>
-  </tr>
-  <tr>
-    <td align="center">form</td>
-    <td align="center">其他图片格式</td>
-    <td>返回对应格式的图片，不存在时默认返回jpg</td>
-  </tr>
-</tbody>
+      <td align="center"><strong>cat</strong><br><small style="color:red">(必填)</small></td>
+      <td align="center"><code>JSON Key</code></td>
+      <td>指定分类名称（需与 JSON 配置文件中的 Key 一致）。</td>
+    </tr>
+    <tr>
+      <td align="center" rowspan="3"><strong>type</strong><br><small>(可选)</small></td>
+      <td align="center"><code>302</code></td>
+      <td>
+        <strong>跳转模式：</strong>返回 302 重定向到图片真实地址。<br>
+        适用于 <code>background-image</code> 或直接通过 URL 引用图片的场景。
+      </td>
+    </tr>
+    <tr>
+      <td align="center"><code>json</code></td>
+      <td>
+        <strong>API 模式：</strong>返回包含图片直链、CDN 链接、设备类型等元数据的 JSON 对象。
+      </td>
+    </tr>
+    <tr>
+      <td align="center"><i>(留空)</i></td>
+      <td>
+        <strong>直出模式：</strong>直接返回二进制图片数据流（默认为此模式）。
+      </td>
+    </tr>
+    <tr>
+      <td align="center" rowspan="4"><strong>device</strong><br><small>(可选)</small></td>
+      <td align="center"><code>pc</code></td>
+      <td>强制抽取 <strong>PC 端</strong> 列表中的图片。</td>
+    </tr>
+    <tr>
+      <td align="center"><code>mobile</code></td>
+      <td>强制抽取 <strong>移动端</strong> 列表中的图片。</td>
+    </tr>
+    <tr>
+      <td align="center"><code>invalid</code></td>
+      <td>
+        <strong>全池随机模式：</strong>无视设备类型，在该分类下所有图片中随机抽取。<br>
+        <em>(注意：此模式下返回的 JSON 或 Header 中会包含真实的设备归属)</em>
+      </td>
+    </tr>
+    <tr>
+      <td align="center"><i>(留空)</i></td>
+      <td>
+        <strong>智能判断模式：</strong>根据请求头的 <code>User-Agent</code> 自动判断设备。<br>
+        <span style="color: #d9534f; font-size: 0.9em;">⚠️ 注意：自动判断模式下，无法使用 <code>id</code> 参数。</span>
+      </td>
+    </tr>
+    <tr>
+      <td align="center"><strong>id</strong><br><small>(可选)</small></td>
+      <td align="center"><code>数值 (Integer)</code></td>
+      <td>
+        指定获取第 N 张图片（从 1 开始排序）。<br>
+        <span style="color: #d9534f; font-size: 0.9em;">⚠️ 必须同时明确指定 <code>device</code> 参数（pc/mobile）才生效。</span>
+      </td>
+    </tr>
+    <tr>
+      <td align="center"><strong>form</strong><br><small>(可选)</small></td>
+      <td align="center"><code>webp</code> / <code>jpg</code></td>
+      <td>
+        指定返回的图片格式。<br>
+        默认为 <code>jpg</code>。如指定为 <code>webp</code>，程序将尝试返回 WebP 版本（支持自动转码）。
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 ### 示例
@@ -149,13 +176,15 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 }
 ```
 
-- 正确响应通常会带有如下标头
-![正确响应标头](https://cdn.jsdelivr.net/gh/Cheshire-Nya/easy-random-image-api/例图/正确响应.png)
+- 正确响应通常会带有如下标头<br>
 
-- 错误响应通常会带有如下标头
-![错误响应标头](https://cdn.jsdelivr.net/gh/Cheshire-Nya/easy-random-image-api/例图/错误响应.png)
+![正确响应标头](https://wsrv.nl/?url=https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/refs/heads/main/%E4%BE%8B%E5%9B%BE/%E6%AD%A3%E7%A1%AE%E5%93%8D%E5%BA%94.png)
+
+- 错误响应通常会带有如下标头<br>
+
+![错误响应标头](https://wsrv.nl/?url=https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/refs/heads/main/%E4%BE%8B%E5%9B%BE/%E9%94%99%E8%AF%AF%E5%93%8D%E5%BA%94.png)<br>
 	`X-Error-Reason`有以下几种
-	```
+	
 	No search parameters
 	Invalid Path
 	Invalid image format: 
@@ -167,7 +196,6 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 	No category specified
 	Redirect Config Error
 	404 Template not found
-	```
 
 ## PS
 
