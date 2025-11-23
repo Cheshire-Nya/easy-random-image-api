@@ -99,7 +99,7 @@ var availableDevices = ["mobile", "pc"];
     </tr>
     <tr>
       <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>Integer</code></td>
+      <td><code>数值</code></td>
       <td>
         获取第 N 张图片。<br>
         <span class="tag-warn">⚠️ 建议配合 device 参数使用以确保顺序固定。</span>
@@ -120,7 +120,7 @@ var availableDevices = ["mobile", "pc"];
 
 [https://demo5.randomimg.sfacg.ltd](https://demo5.randomimg.sfacg.ltd)主页
 
-[https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)不带参数直接扔到404
+[https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)不带参数自动判断设备无视分类抽取
 
 [https://demo5.randomimg.sfacg.ltd/api?cat=category1](https://demo5.randomimg.sfacg.ltd/api?cat=category1)无form默认jpg，无device自动识别设备类型
 
@@ -163,7 +163,7 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 ![错误响应标头](https://wsrv.nl/?url=https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/refs/heads/main/%E4%BE%8B%E5%9B%BE/%E9%94%99%E8%AF%AF%E5%93%8D%E5%BA%94.png)<br>
 	`X-Error-Reason`有以下几种
 	
-	No search parameters
+	CDN Error: ${response.status}
 	Invalid Path
 	Invalid image format: 
 	Failed to fetch JSON config

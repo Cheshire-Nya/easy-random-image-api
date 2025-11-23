@@ -36,12 +36,24 @@ var availableDevices = ["mobile", "pc"];
 //【注意】上述url中的所有中文都需写成utf8编码形式，不然会一直给你丢到404，比如我的json地址是"/方案5/image.json"写成了"/%E6%96%B9%E6%A1%885/image.json"
 // ===========================================
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
+  'Access-Control-Allow-Headers': '*',
+};
+
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
 
 async function handleRequest(request) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      headers: corsHeaders
+    });
+  }
+
   let nowUrl = new URL(request.url);
   let urlSearch = nowUrl.search;
 
@@ -151,9 +163,7 @@ async function extractSearch(urlSearch, request) {
 
 function getDeviceType(request) {
   const ua = request.headers.get('User-Agent') || "";
-  // ===============自动判断设备在这修改===================
   const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-  // ===========================================================
   if (mobileRegex.test(ua)) return "mobile";
   return "pc";
 }
@@ -174,7 +184,6 @@ function getGithubSourceUrl(img, returnForm) {
 
 
 function getCdnProxyUrl(githubUrl, returnForm) {
-
   let url = resizeHost + githubUrl;
   
   if (imgResize === 1 && returnForm !== 'jpg') {
@@ -186,13 +195,7 @@ function getCdnProxyUrl(githubUrl, returnForm) {
 
 async function image(img, returnForm, category, device) {
   let githubUrl = getGithubSourceUrl(img, returnForm);
-  
-  let fetchUrl = resizeHost + githubUrl;
-  
-  if (imgResize === 1 && returnForm !== 'jpg') {
-      fetchUrl += "&output=" + returnForm;
-  }
-
+  let fetchUrl = getCdnProxyUrl(githubUrl, returnForm);
   let contentType = returnForm === 'jpg' ? 'image/jpeg' : `image/${returnForm}`;
   
   let response = await fetch(fetchUrl, {
@@ -213,12 +216,17 @@ async function image(img, returnForm, category, device) {
   newHeaders.set('Access-Control-Expose-Headers', 'X-Image-Category, X-Image-Device');
   newHeaders.set('Cache-Control', 'max-age=0, s-maxage=0');
   
+  newHeaders.set('Access-Control-Allow-Origin', '*');
+  newHeaders.set('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
+  newHeaders.set('Access-Control-Allow-Headers', '*');
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
     headers: newHeaders
   });  
 }
+
 
 function redirect(id, img, category, device, returnForm, request) {
   let nowUrl = new URL(request.url);
@@ -249,7 +257,6 @@ function typejson(id, img, category, device, returnForm, request) {
   let githubUrl = getGithubSourceUrl(img, returnForm);
   
   let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm;
-  
   let proxyUrl = getCdnProxyUrl(githubUrl, returnForm);
 
   return new Response(
@@ -262,7 +269,10 @@ function typejson(id, img, category, device, returnForm, request) {
       "workerUrl": workerUrl,
       "proxyUrl": proxyUrl
     }, null, 2), {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 
+        'Content-Type': 'application/json',
+        ...corsHeaders
+    }
   });
 }
 
@@ -284,35 +294,90 @@ async function error(reason = "Unknown Error") {
     if (response.ok) {
       htmlContent = await response.text();
     } else {
-      throw new Error("404 Template not found");
+      throw new Error("404 Template Fetch Failed");
     }
   } catch (e) {
-    // 如果连 404 模板都获取失败，使用这个备用的简易 HTML
     isFallback = true;
     htmlContent = `
     <!DOCTYPE html>
-    <html>
+    <html lang="zh-CN">
     <head>
-      <title>404 Not Found</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>404 Not Found (Fallback)</title>
       <style>
-        body { font-family: sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
-        h1 { font-size: 48px; color: #333; }
-        p { font-size: 18px; color: #666; }
-        .debug { margin-top: 20px; padding: 10px; background: #fff; border: 1px solid #ddd; display: inline-block; text-align: left; color: #d9534f; }
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
+            --text-secondary: #e2e8f0;
+            --box-bg: rgba(0, 0, 0, 0.2);
+        }
+        body {
+          margin: 0;
+          font-family: system-ui, -apple-system, sans-serif;
+          background: var(--bg-gradient);
+          color: var(--text-color);
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+        }
+        .container {
+          background: var(--glass-bg);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid var(--glass-border);
+          border-radius: 16px;
+          padding: 3rem;
+          max-width: 500px;
+          width: 90%;
+          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        h1 { margin: 0 0 1rem; font-size: 3rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        p { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; }
+        .debug-box {
+          background: var(--box-bg);
+          padding: 1rem;
+          border-radius: 8px;
+          text-align: left;
+          font-size: 0.9rem;
+          border: 1px solid var(--glass-border);
+        }
+        .tag {
+          display: inline-block;
+          background: #e53e3e;
+          color: white;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 0.75rem;
+          margin-bottom: 0.5rem;
+        }
+        code { font-family: monospace; color: #feb2b2; }
       </style>
     </head>
     <body>
-      <h1>404 - Not Found</h1>
-      <p>The requested image or category could not be found.</p>
-      <div class="debug">
-        <strong>Debug Info:</strong><br>
-        Reason: ${reason}<br>
-        <small>(Notice:404模板没有成功加载,所以你会看到这个备用的简单页面.)</small>
+      <div class="container">
+        <h1>404</h1>
+        <p>无法找到请求的资源。</p>
+        
+        <div class="debug-box">
+          <span class="tag">Fallback Mode</span><br>
+          <strong>Error Reason:</strong><br>
+          <code>${reason}</code>
+          <br><br>
+          <small style="color: #cbd5e0;">
+            (注意: 404模板加载失败，您正在查看内置备用页面。)
+          </small>
+        </div>
       </div>
     </body>
     </html>
     `;
   }
+
 
   return new Response(htmlContent, {
     status: 404,
@@ -320,10 +385,12 @@ async function error(reason = "Unknown Error") {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'X-Error-Reason': reason,
-      'X-Error-Fallback': isFallback ? 'true' : 'false'
+      'X-Error-Fallback': isFallback ? 'true' : 'false',
+      ...corsHeaders 
     }
   });
 }
+
 
 async function index() {
   let response = await fetch(urlIndex);

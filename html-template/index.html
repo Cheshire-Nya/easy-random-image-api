@@ -1,111 +1,325 @@
 <!DOCTYPE html>
-<html lang="zh" class="no-js">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>demo for Easy-random-image-api</title>
-		<meta name="description" content="A main-page for Cheshire-Nya/easy-random-image-api" />
-		<meta name="keywords" content="api, image, random-image" />
-		<meta name="author" content="Little Cheshire" />
-		<link rel="shortcut icon" href="https://static.cheshirenya.top/random-img-api/favicon.ico">
-		<link rel="stylesheet" type="text/css" href="https://gcore.jsdelivr.net/gh/Cheshire-Nya/easy-random-image-api@main/html-template/css/base.css" />
-		<link rel="stylesheet" type="text/css" href="https://gcore.jsdelivr.net/gh/Cheshire-Nya/easy-random-image-api@main/html-template/css/glitch-slideshow.css" />
-		<script>
-		    document.documentElement.className="js";
-			var supportsCssVars=function(){var e,t=document.createElement("style");
-			return t.innerHTML="root: { --tmp-var: bold; }",
-			document.head.appendChild(t),
-			e=!!(window.CSS&&window.CSS.supports&&window.CSS.supports("font-weight","var(--tmp-var)")),
-			t.parentNode.removeChild(t),e};
-			supportsCssVars()||alert("远古浏览器不支持该页面.");
-		</script>
-	</head>
-	<body class="demo-1 loading">
-		<svg class="hidden">
-			<symbol id="icon-arrow" viewBox="0 0 24 24">
-				<title>arrow</title>
-				<polygon points="6.3,12.8 20.9,12.8 20.9,11.2 6.3,11.2 10.2,7.2 9,6 3.1,12 9,18 10.2,16.8 "/>
-			</symbol>
-			<symbol id="icon-drop" viewBox="0 0 24 24">
-				<title>drop</title>
-				<path d="M12,21c-3.6,0-6.6-3-6.6-6.6C5.4,11,10.8,4,11.4,3.2C11.6,3.1,11.8,3,12,3s0.4,0.1,0.6,0.3c0.6,0.8,6.1,7.8,6.1,11.2C18.6,18.1,15.6,21,12,21zM12,4.8c-1.8,2.4-5.2,7.4-5.2,9.6c0,2.9,2.3,5.2,5.2,5.2s5.2-2.3,5.2-5.2C17.2,12.2,13.8,7.3,12,4.8z"/><path d="M12,18.2c-0.4,0-0.7-0.3-0.7-0.7s0.3-0.7,0.7-0.7c1.3,0,2.4-1.1,2.4-2.4c0-0.4,0.3-0.7,0.7-0.7c0.4,0,0.7,0.3,0.7,0.7C15.8,16.5,14.1,18.2,12,18.2z"/>
-			</symbol>
-			<symbol id="icon-github" viewBox="0 0 33 33">
-				<title>github</title>
-				<path d="M16.608.455C7.614.455.32 7.748.32 16.745c0 7.197 4.667 13.302 11.14 15.456.815.15 1.112-.353 1.112-.785 0-.386-.014-1.411-.022-2.77-4.531.984-5.487-2.184-5.487-2.184-.741-1.882-1.809-2.383-1.809-2.383-1.479-1.01.112-.99.112-.99 1.635.115 2.495 1.679 2.495 1.679 1.453 2.489 3.813 1.77 4.741 1.353.148-1.052.569-1.77 1.034-2.177-3.617-.411-7.42-1.809-7.42-8.051 0-1.778.635-3.233 1.677-4.371-.168-.412-.727-2.069.16-4.311 0 0 1.367-.438 4.479 1.67a15.602 15.602 0 0 1 4.078-.549 15.62 15.62 0 0 1 4.078.549c3.11-2.108 4.475-1.67 4.475-1.67.889 2.242.33 3.899.163 4.311C26.37 12.66 27 14.115 27 15.893c0 6.258-3.809 7.635-7.437 8.038.584.503 1.105 1.497 1.105 3.017 0 2.177-.02 3.934-.02 4.468 0 .436.294.943 1.12.784 6.468-2.159 11.131-8.26 11.131-15.455 0-8.997-7.294-16.29-16.291-16.29"/>
-			</symbol>
-		</svg>
-		<main>
-			<div class="content content--fixed">
-				<header class="codrops-header">
-					<h1 class="codrops-header__title">EASY-RANDOM-IMAGE-API</h1>
-				</header>
-				<a class="github" href="https://github.com/Cheshire-Nya/easy-random-image-api" title="Find this project on GitHub"><svg class="icon icon--github"><use xlink:href="#icon-github"></use></svg></a>
-				<nav class="demos">
-					<a class="demo demo--current" href="/">随机图片API</a>
-					<a class="demo" href="#">其他链接</a>
-				</nav>
-				<p class="info">Work with<a href="https://workers.cloudflare.com/">Cloudflare Workers</a></p>
-			</div>
-			<div class="content">
-				<div class="slides slides--fullscreen effect-1" style="display:fixed;">
-					<div class="slide slide--current">
-						<div class="slide__img glitch" style="background-image: url(https://static.cheshirenya.top/random-img-api/1.jpg);"></div>
-					</div>
-					<div class="slide">
-						<div class="slide__img glitch" style="background-image: url(https://static.cheshirenya.top/random-img-api/2.jpg);"></div>
-					</div>
-					<!--<div class="slide">
-						<div class="slide__img glitch" style="background-image: url(img/3.jpg);"></div>
-					</div>
-					<div class="slide">
-						<div class="slide__img glitch" style="background-image: url(img/4.jpg);"></div>
-					</div>-->
-				</div>
-				<nav class="slide-nav">
-				    <p style="font-size:2rem"><a href="https://github.com/Cheshire-Nya/easy-random-image-api" target="_blank">Cheshire-Nya/easy-random-image-api</a>演示用主页模板</p>
-                    <table>
-                    <thead>
-                        <tr>
-                            <th><p>可用参数</p></th>
-                            <th><p>值</p></th>
-                            <th><p>说明</p></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td align="center"><p>cat</p></td>
-                            <td align="center"><p>图片分类<br>（文件夹名）</p></td>
-                            <td><p>在该分类中抽取图片（没有该参数时从默认文件夹抽取）</p></td>
-                        </tr>
-                        <tr>
-                            <td align="center" rowspan="2"><p>type</p></td>
-                            <td align="center"><p>302</p></td>
-                            <td><p>通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等</p></td>
-                        </tr>
-                        <tr>
-                            <td align="center"><p>json</p></td>
-                            <td><p>以json格式返回</p></td>
-                        </tr>
-                        <tr>
-                            <td align="center"><p>id</p></td>
-                            <td align="center"><p>&lt;数值&gt;</p></td>
-                            <td><p>返回名称为&lt;数值&gt;的指定图片(存在id时不允许type=302)</p></td>
-                        </tr>
-                        <tr>
-                            <td align="center"><p>不使用参数</p></td>
-                            <td align="center"><p>空</p></td>
-                            <td><p>简简单单抽张图</p></td>
-                        </tr>
-                    </tbody>
-                    </table>
-				</nav>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Random Image API</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(30, 30, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-color: #ffffff;
+            --text-secondary: #cbd5e0;
+            --accent-color: #90cdf4;
+            --tag-bg: rgba(0, 0, 0, 0.5);
+        }
 
-			</div>
-			
-		</main>
-		<script src="https://gcore.jsdelivr.net/gh/Cheshire-Nya/easy-random-image-api@main/html-template/js/imagesloaded.pkgd.min.js"></script>
-		<script src="https://gcore.jsdelivr.net/gh/Cheshire-Nya/easy-random-image-api@main/html-template/js/demo.js"></script>
-		<script src="https://gcore.jsdelivr.net/gh/Cheshire-Nya/easy-random-image-api@main/html-template/js/demo1.js"></script>
-	</body>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #1a1a1a;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        #bg-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        #default-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-gradient);
+            z-index: 1;
+            transition: opacity 0.8s ease-out;
+        }
+
+        #glitch-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            opacity: 0; 
+        }
+
+        #static-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.6s ease-in;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem; }
+        h1 { font-size: 2rem; margin: 0 0 0.5rem 0; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        p.subtitle { color: var(--text-secondary); margin: 0; font-size: 0.9rem; }
+        .table-wrapper { overflow-x: auto; border-radius: 8px; background: rgba(0, 0, 0, 0.3); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--glass-border); }
+        th { background-color: rgba(0, 0, 0, 0.4); font-weight: 600; color: var(--accent-color); white-space: nowrap; }
+        tr:last-child td { border-bottom: none; }
+        code { background: var(--tag-bg); padding: 2px 6px; border-radius: 4px; font-family: Consolas, Monaco, monospace; color: #ffcb6b; }
+        .tag { display: inline-block; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; }
+        .tag-opt { background: #2f855a; color: white; }
+        .tag-tip { color: #90cdf4; font-size: 0.85em; display: block; margin-top: 4px; }
+        .tag-warn { color: #fc8181; font-size: 0.85em; display: block; margin-top: 4px; }
+        footer { margin-top: 2rem; text-align: center; font-size: 0.8rem; color: var(--text-secondary); }
+        a { color: var(--accent-color); text-decoration: none; transition: color 0.2s; }
+        a:hover { color: #fff; text-decoration: underline; }
+        .btn { display: inline-block; margin-top: 15px; padding: 10px 20px; background: rgba(255,255,255,0.1); border-radius: 30px; border: 1px solid var(--glass-border); color: white; font-weight: bold; transition: all 0.3s; text-decoration: none; backdrop-filter: blur(4px); }
+        .btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        .effect-hardcore {
+            --gap-horizontal: 40px; 
+            --gap-vertical: 15px;
+            --time-anim: 0.8s;
+            --delay-anim: 0s;
+            --blend-mode-1: none;
+            --blend-mode-2: screen;
+            --blend-mode-3: multiply;
+            --blend-mode-4: overlay;
+            --blend-mode-5: overlay;
+            --blend-color-1: transparent;
+            --blend-color-2: #ff0000;
+            --blend-color-3: #00ffea;
+            --blend-color-4: #0000ff;
+            --blend-color-5: #ff00ff;
+        }
+
+        .glitch { position: relative; width: 100%; height: 100%; overflow: hidden; }
+        .glitch__img {
+            position: absolute;
+            top: calc(-1 * var(--gap-vertical));
+            left: calc(-1 * var(--gap-horizontal));
+            width: calc(100% + var(--gap-horizontal) * 2);
+            height: calc(100% + var(--gap-vertical) * 2);
+            background-color: var(--blend-color-1);
+            background-size: cover;
+            background-position: center;
+            transform: translate3d(0,0,0);
+            background-blend-mode: var(--blend-mode-1);
+        }
+        
+        .glitch--animate .glitch__img {
+            animation-duration: var(--time-anim);
+            animation-delay: var(--delay-anim);
+            animation-timing-function: step-end; 
+            animation-iteration-count: infinite;
+        }
+        
+        .glitch--animate .glitch__img:first-child { animation-name: glitch-anim-1; opacity: 1; }
+        
+        .glitch--animate .glitch__img:nth-child(2) { opacity: 0.8; background-color: var(--blend-color-2); background-blend-mode: var(--blend-mode-2); animation-name: glitch-anim-2; }
+        .glitch--animate .glitch__img:nth-child(3) { opacity: 0.8; background-color: var(--blend-color-3); background-blend-mode: var(--blend-mode-3); animation-name: glitch-anim-3; }
+        .glitch--animate .glitch__img:nth-child(4) { opacity: 0.8; background-color: var(--blend-color-4); background-blend-mode: var(--blend-mode-4); animation-name: glitch-anim-4; }
+        .glitch--animate .glitch__img:nth-child(5) { opacity: 0.8; background-color: var(--blend-color-5); background-blend-mode: var(--blend-mode-5); animation-name: glitch-anim-flash; }
+
+        @keyframes glitch-anim-1 {
+            0% { transform: translate3d(var(--gap-horizontal),0,0) scale3d(-1,-1,1); clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); }
+            10% { transform: translate3d(calc(-1 * var(--gap-horizontal)),0,0) scale3d(1.1,1.1,1); clip-path: polygon(0 15%, 100% 15%, 100% 15%, 0 15%); }
+            20% { transform: translate3d(0,0,0) scale3d(0.9,0.9,1); clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%); }
+            30% { transform: translate3d(0,calc(-1 * var(--gap-vertical)),0) scale3d(1,1,1); clip-path: polygon(0 1%, 100% 1%, 100% 2%, 0 2%); }
+            40% { transform: translate3d(0,0,0) scale3d(1.2,1.2,1); clip-path: polygon(0 33%, 100% 33%, 100% 33%, 0 33%); }
+            50% { transform: translate3d(var(--gap-horizontal),0,0) scale3d(1,1,1); clip-path: polygon(0 44%, 100% 44%, 100% 44%, 0 44%); }
+            60% { transform: translate3d(0,0,0) scale3d(1.1,1.1,1); clip-path: polygon(0 50%, 100% 50%, 100% 20%, 0 20%); }
+            70% { transform: translate3d(calc(-1 * var(--gap-horizontal)),0,0); clip-path: polygon(0 70%, 100% 70%, 100% 70%, 0 70%); }
+            80% { transform: translate3d(0,0,0) scale3d(0.9,0.9,1); clip-path: polygon(0 80%, 100% 80%, 100% 80%, 0 80%); }
+            90% { transform: translate3d(0,0,0) scale3d(1,1,1); clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%); }
+            100% { transform: translate3d(0,0,0) scale3d(1,1,1); clip-path: polygon(0 60%, 100% 60%, 100% 65%, 0 65%); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { opacity: 1; transform: translate3d(calc(-1 * var(--gap-horizontal)),0,0); clip-path: polygon(0 25%, 100% 25%, 100% 30%, 0 30%); }
+            15% { transform: translate3d(10px,0,0); clip-path: polygon(0 10%, 100% 10%, 100% 40%, 0 40%); }
+            30% { transform: translate3d(0, 10px, 0); clip-path: polygon(0 5%, 100% 5%, 100% 20%, 0 20%); }
+            45% { transform: translate3d(-10px, 0, 0); clip-path: polygon(0 20%, 100% 20%, 100% 20%, 0 20%); }
+            60% { transform: translate3d(0, 0, 0); clip-path: polygon(0 50%, 100% 50%, 100% 80%, 0 80%); }
+            75% { transform: translate3d(20px, 20px, 0); clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%); }
+            100% { opacity: 1; transform: translate3d(0,0,0); clip-path: polygon(0 25%, 100% 25%, 100% 30%, 0 30%); }
+        }
+        @keyframes glitch-anim-3 {
+            0% { opacity: 1; transform: translate3d(0, calc(-1 * var(--gap-vertical)), 0) scale3d(-1,-1,1); clip-path: polygon(0 1%, 100% 1%, 100% 3%, 0 3%); }
+            25% { transform: translate3d(5px, 0, 0); clip-path: polygon(0 10%, 100% 10%, 100% 30%, 0 30%); }
+            50% { transform: translate3d(0, 5px, 0) scale3d(1.1,1.1,1); clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%); }
+            75% { transform: translate3d(-5px, 0, 0); clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0); clip-path: polygon(0 1%, 100% 1%, 100% 3%, 0 3%); }
+        }
+        @keyframes glitch-anim-4 {
+            0% { transform: translate3d(0,0,0) scale3d(1.2,1.2,1); opacity: 0.5; }
+            20% { transform: translate3d(-20px,0,0); opacity: 0.7; }
+            40% { transform: translate3d(20px,0,0); opacity: 0.3; }
+            60% { transform: translate3d(0,-20px,0); opacity: 0.6; }
+            80% { transform: translate3d(0,20px,0); opacity: 0.4; }
+            100% { transform: translate3d(0,0,0); opacity: 0.5; }
+        }
+        @keyframes glitch-anim-flash {
+            0% { opacity: 0.5; transform: translate3d(var(--gap-horizontal), var(--gap-vertical), 0); }
+            10% { opacity: 0.1; }
+            20% { opacity: 0.8; transform: translate3d(-10px, 10px, 0); }
+            30% { opacity: 0; }
+            40% { opacity: 0.6; }
+            50% { opacity: 0.1; transform: translate3d(20px, -20px, 0); }
+            100% { opacity: 0; transform: translate3d(0, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="bg-wrapper">
+        <div id="default-gradient"></div>
+        <div id="glitch-container" class="effect-hardcore"></div>
+        <div id="static-image"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Easy Random Image API</h1>
+            <p class="subtitle">基于 Cloudflare Workers 的全功能随机图片服务</p>
+            <a href="/api" class="btn" target="_blank">🎲 随机来一张 (/api)</a>
+        </header>
+
+        <section>
+            <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th width="15%">参数</th>
+                      <th width="20%">值</th>
+                      <th>说明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
+                      <td><code>JSON Key</code></td>
+                      <td>指定分类名称。<span class="tag-tip">留空则在所有分类中随机抽取。</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
+                      <td><code>pc/mobile</code><br><code>invalid</code></td>
+                      <td><strong>invalid</strong>: 全池随机模式。<span class="tag-tip">留空则自动判断设备。</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
+                      <td><code>302</code><br><code>json</code></td>
+                      <td><strong>json</strong>: 返回元数据。<br><strong>(空)</strong>: 直接返回图片。</td>
+                    </tr>
+                    <tr>
+                      <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
+                      <td><code>数值N</code></td>
+                      <td>获取第 N 张图片。<span class="tag-warn">⚠️ 建议配合 device 使用。</span></td>
+                    </tr>
+                    <tr>
+                      <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
+                      <td><code>webp/jpg</code></td>
+                      <td>指定格式 (支持 CDN 自动转码)。</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <p>Powered by <a href="https://workers.cloudflare.com/" target="_blank">Cloudflare Workers</a> &bull; Project by <a href="https://github.com/Cheshire-Nya/easy-random-image-api" target="_blank">Cheshire-Nya</a></p>
+        </footer>
+    </div>
+
+    <script>
+        (async function() {
+            const gradientEl = document.getElementById('default-gradient');
+            const glitchContainer = document.getElementById('glitch-container');
+            const staticImageEl = document.getElementById('static-image');
+
+            const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 3000));
+
+            try {
+                const res = await fetch('/api?type=json');
+                if (!res.ok) throw new Error('API Request failed');
+                const data = await res.json();
+                const imgUrl = data.proxyUrl || data.workerUrl;
+
+                const loadImages = new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.src = imgUrl;
+                    img.onload = () => resolve(imgUrl);
+                    img.onerror = reject;
+                });
+
+                await Promise.all([waitThreeSeconds, loadImages]);
+
+
+                const glitchWrapper = document.createElement('div');
+                glitchWrapper.className = 'glitch glitch--animate';
+                for (let i = 0; i < 5; i++) {
+                    const layer = document.createElement('div');
+                    layer.className = 'glitch__img';
+                    layer.style.backgroundImage = `url('${imgUrl}')`;
+                    glitchWrapper.appendChild(layer);
+                }
+                glitchContainer.appendChild(glitchWrapper);
+
+                staticImageEl.style.backgroundImage = `url('${imgUrl}')`;
+
+                requestAnimationFrame(() => {
+                    gradientEl.style.opacity = '0'; 
+                    glitchContainer.style.opacity = '1';
+                });
+
+                setTimeout(() => {
+                    staticImageEl.style.opacity = '1'; 
+                }, 2200);
+
+                setTimeout(() => {
+                    glitchContainer.style.display = 'none'; 
+                    glitchContainer.innerHTML = '';
+                }, 3000); 
+
+            } catch (e) {
+                console.warn('Background load failed:', e);
+            }
+        })();
+    </script>
+</body>
 </html>
