@@ -283,7 +283,7 @@
             const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 3000));
 
             try {
-                const res = await fetch('/api?type=json');
+                const res = await fetch('/api?type=json&q=60');
                 if (!res.ok) throw new Error('API Request failed');
                 const data = await res.json();
                 const imgUrl = data.proxyUrl || data.workerUrl;
