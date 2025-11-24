@@ -40,6 +40,7 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
   'Access-Control-Allow-Headers': '*',
+  'Access-Control-Max-Age': '86400',
 };
 
 
@@ -250,7 +251,7 @@ async function image(img, returnForm, category, device, searchParams) {
   newHeaders.set('X-Image-Category', category);
   newHeaders.set('X-Image-Device', device);
   newHeaders.set('Access-Control-Expose-Headers', 'X-Image-Category, X-Image-Device');
-  newHeaders.set('Cache-Control', 'max-age=0, s-maxage=0');
+  newHeaders.set('Cache-Control', 'public, max-age=7200');
   
   newHeaders.set('Access-Control-Allow-Origin', '*');
   newHeaders.set('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
