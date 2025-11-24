@@ -383,7 +383,7 @@
         </footer>
     </div>
 
-    <script>
+<script>
         function toggleDocs() {
             const section = document.getElementById('docs-section');
             const btn = document.getElementById('toggle-docs');
@@ -411,10 +411,16 @@
             const glitchContainer = document.getElementById('glitch-container');
             const staticImageEl = document.getElementById('static-image');
 
-            const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 5000));
+            const screenW = Math.ceil(window.innerWidth * window.devicePixelRatio);
+            const screenH = Math.ceil(window.innerHeight * window.devicePixelRatio);
+
+            const apiUrl = `/api?type=json&w=${screenW}&h=${screenH}&fit=cover&q=75&form=webp`;
+
+            const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 3000));
 
             try {
-                const res = await fetch('/api?type=json&q=60');
+                const res = await fetch(apiUrl);
+                
                 if (!res.ok) throw new Error('API Request failed');
                 const data = await res.json();
                 const imgUrl = data.proxyUrl || data.workerUrl;
