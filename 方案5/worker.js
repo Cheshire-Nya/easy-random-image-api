@@ -158,6 +158,7 @@ async function extractSearch(urlSearch, request) {
   }
 }
 
+
 function getDeviceType(request) {
   const ua = request.headers.get('User-Agent') || "";
   const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
@@ -165,21 +166,25 @@ function getDeviceType(request) {
   return "pc";
 }
 
+
 function smartEncodePath(path) {
     return path.split('/').map(part => encodeURIComponent(part)).join('/');
 }
 
+
 function getExtraQueryString(searchParams) {
-    let str = "";
-    const systemParams = ['cat', 'device', 'type', 'id', 'form'];
-    
-    for (const [key, value] of searchParams) {
-        if (!systemParams.includes(key)) {
-            str += `&${key}=${encodeURIComponent(value)}`;
-        }
-    }
-    return str;
+  let str = "";
+  
+  const systemParams = ['cat', 'device', 'type', 'id', 'form', 'output'];
+  
+  for (const [key, value] of searchParams) {
+      if (!systemParams.includes(key)) {
+          str += `&${key}=${encodeURIComponent(value)}`;
+      }
+  }
+  return str;
 }
+
 
 function getGithubSourceUrl(img, returnForm) {
     let encodedImg = smartEncodePath(img);
@@ -188,6 +193,7 @@ function getGithubSourceUrl(img, returnForm) {
     }
     return imgHost + returnForm + "/" + encodedImg + "." + returnForm;
 }
+
 
 function getCdnProxyUrl(githubUrl, returnForm, searchParams) {
     let url = resizeHost + githubUrl;
