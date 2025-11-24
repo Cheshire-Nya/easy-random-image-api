@@ -101,7 +101,8 @@ var availableDevices = ["mobile", "pc"];
       <td><code>w</code>, <code>h</code>, <code>q</code>...</td>
       <td>
         支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的所有参数。<br>
-        例: <code>w=200</code> (宽200), <code>q=80</code> (质量80)
+        例: <code>w=200</code> (宽200), <code>q=80</code> (质量80)<br>
+		但为了保持对本地存储额外格式图片的支持，<code>output</code>是无效的
       </td>
     </tr>
   </tbody>

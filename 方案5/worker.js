@@ -203,20 +203,40 @@ function getCdnProxyUrl(githubUrl, returnForm, searchParams) {
     return url;
 }
 
+
 async function image(img, returnForm, category, device, searchParams) {
   let githubUrl = getGithubSourceUrl(img, returnForm);
   let fetchUrl = getCdnProxyUrl(githubUrl, returnForm, searchParams);
+  
   let contentType = returnForm === 'jpg' ? 'image/jpeg' : `image/${returnForm}`;
   
+  const browserUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0";
+
   let response = await fetch(fetchUrl, {
       headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "User-Agent": browserUA,
           "Referer": "https://github.com/"
       }
   });
 
   if (!response.ok) {
-      return error(`CDN Error: ${response.status}`);
+      let fallbackUrl = getGithubSourceUrl(img, 'jpg');
+      
+      response = await fetch(fallbackUrl, {
+          headers: {
+              "User-Agent": browserUA
+          }
+      });
+
+      if (response.ok) {
+          contentType = 'image/jpeg';
+          
+          response = new Response(response.body, response);
+          response.headers.set('X-Image-Source', 'Fallback-GitHub-Raw');
+      } 
+      else {
+          return error(`Image Load Failed: CDN(${fetchUrl}) & Fallback(${fallbackUrl})`);
+      }
   }
 
   let newHeaders = new Headers(response.headers);
@@ -236,6 +256,7 @@ async function image(img, returnForm, category, device, searchParams) {
     headers: newHeaders
   });  
 }
+
 
 function redirect(id, img, category, device, returnForm, request, searchParams) {
   let nowUrl = new URL(request.url);
@@ -258,6 +279,7 @@ function redirect(id, img, category, device, returnForm, request, searchParams) 
 
   return type302(targetUrl);
 }
+
 
 function typejson(id, img, category, device, returnForm, request, searchParams) {
   let nowUrl = new URL(request.url);
