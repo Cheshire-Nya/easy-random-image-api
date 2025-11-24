@@ -1,10 +1,38 @@
 # easy-random-img-api
 
-## 简介
+一个基于 Cloudflare Workers 的轻量级、高性能随机图片 API 服务。
 
-白嫖Github仓库和Cloudflare Workers简单快速实现可分类可判断设备的随机图片抽取
+## 📖 简介 | Introduction
+利用 Cloudflare Workers 的无服务器特性，配合 GitHub 仓库作为存储后端，构建了一个零成本、响应速度极快的随机图片 API。不仅支持多分类管理，还通过集成 CDN 实现实时的图片压缩、格式转换和裁剪，非常适合用于网站背景、博客配图或小程序开发。
 
 **快给我点star**
+
+## ✨ 项目特性 | Features
+- **⚡️ Serverless 架构**：完全运行在 Cloudflare Workers 上，依托全球边缘网络，极低延迟，无需购买服务器。
+
+- **🖼️ GitHub 图床集成**：图片资源托管在 GitHub 仓库，通过 JSON 配置文件灵活管理分类，维护简单。
+
+- **📱 智能设备适配**：
+
+   自动根据 User-Agent 识别 PC 或移动端，返回适配的图片。
+
+   支持 device=invalid 模式，实现全图池混合随机抽取。
+
+- **🎨 实时图片处理**：
+
+   内置 CDN 代理（wsrv.nl），支持 URL 参数透传。
+
+   无需处理原图，通过 API 参数即可实时控制图片宽 (w)、高 (h)、质量 (q)、裁剪 (fit) 及格式转换 (form=webp)。
+
+- **🔀 多种响应模式**：
+
+   302 跳转：重定向至图片真实地址（适合 background-image）。
+
+   JSON 元数据：返回包含直链、CDN 链、分类及设备信息的 JSON 对象。
+
+   直链输出：直接返回图片二进制流，伪装浏览器 UA 防止 403。
+
+- **💻 现代化 UI**：提供一套简洁的演示主页和404页，集成随机抽取背景图片的案例与参数说明文档。
 
 ## 部署和使用
 
@@ -38,7 +66,7 @@ var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-
 // 用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>/"
 
 var redirectProxy = 2;
-// 代理模式: 
+// 代理模式（使用场景通常是type=302）: 
 // 0 = GitHub 直链 (不推荐，国内访问慢)
 // 1 = Worker 代理 (消耗 Worker 流量及次数)
 // 2 = 第三方 CDN 代理 (使用 wsrv.nl 加速)
