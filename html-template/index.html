@@ -418,34 +418,53 @@
                     <tr>
                       <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
                       <td><code>JSON Key</code></td>
-                      <td>指定分类。<span class="tag-tip">留空则随机全分类。</span></td>
+                      <td>指定分类。<span class="tag-tip">留空则在所有分类中随机抽取。</span></td>
                     </tr>
                     <tr>
                       <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>pc/mobile</code><br><code>invalid</code></td>
-                      <td><strong>invalid</strong>: 全池随机。<span class="tag-tip">留空自动判断设备。</span></td>
+                      <td><code>pc</code><br><code>mobile</code><br><code>invalid</code></td>
+                      <td>
+                        <strong>pc/mobile</strong>: 强制筛选特定设备。<br>
+                        <strong>invalid</strong>: 全池随机模式（混合所有设备图）。<br>
+                        <span class="tag-tip">留空则根据 User-Agent 自动判断。</span>
+                      </td>
                     </tr>
                     <tr>
                       <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>302</code><br><code>json</code></td>
-                      <td><strong>json</strong>: 返回元数据。<br><strong>(空)</strong>: 直接返回图片。</td>
+                      <td><code>302</code><br><code>json</code><br><code>(空)</code></td>
+                      <td>
+                        <strong>302</strong>: 跳转到图片真实地址 (默认)。<br>
+                        <strong>json</strong>: 返回包含图片信息、CDN链接、元数据的 JSON。<br>
+                        <strong>(空)</strong>: 直接返回图片二进制流。
+                      </td>
                     </tr>
                     <tr>
                       <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>数值N</code></td>
-                      <td>获取第 N 张图。<span class="tag-warn">⚠️ 建议配合 device 使用。</span></td>
+                      <td><code>Integer</code> / <code>String</code></td>
+                      <td>
+                        <strong>数字</strong>: 获取筛选结果中的第 N 张图。<br>
+                        <strong>字符串</strong>: 直接获取指定 Key 的图片 (如 <code>id=miku_01</code>)。
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>not_id</strong><br><span class="tag tag-opt">可选</span></td>
+                      <td><code>String (Key)</code></td>
+                      <td>
+                        传入当前图片的 Key (如 <code>miku_01</code>)。<br>
+                        <span class="tag-tip">API 将确保随机出的下一张图不是这张 (用于去重)。</span>
+                      </td>
                     </tr>
                     <tr>
                       <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>webp/jpg</code></td>
-                      <td>指定格式 (支持自动转码)。</td>
+                      <td><code>webp</code> / <code>jpg</code></td>
+                      <td>指定返回格式。系统会自动判断是否需要通过 CDN 转码。</td>
                     </tr>
                     <tr>
                       <td><strong>CDN参数</strong><br><span class="tag tag-opt">透传</span></td>
                       <td><code>w</code>, <code>h</code>, <code>q</code>...</td>
                       <td>
-                        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的参数。<br>
-                        例: <code>w=200</code>, <code>q=80</code>
+                        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的所有处理参数。<br>
+                        例: <code>w=200</code> (宽200), <code>q=75</code> (质量75), <code>fit=cover</code>
                       </td>
                     </tr>
                   </tbody>
