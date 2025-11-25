@@ -10,7 +10,7 @@ const url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image
 // 404模板地址
 
 const repoConfig = {
-    "default": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/",
+    "default": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/jpg/",
     "genshin": "https://raw.githubusercontent.com/Cheshire-Nya/random-genshin-img/main/"
 };
 // 用于图片存储的仓库分支(支持多个仓库分开存储)
