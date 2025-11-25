@@ -44,9 +44,15 @@ const corsHeaders = {
 };
 
 
+let cachedImgList = null;
+let lastFetchTime = 0;
+const CACHE_TTL = 60 * 1000;
+
+
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request));
 });
+
 
 async function handleRequest(request) {
   if (request.method === "OPTIONS") {
@@ -65,6 +71,22 @@ async function handleRequest(request) {
   }
 }
 
+
+async function getOrFetchJson() {
+  const now = Date.now();
+  if (cachedImgList && (now - lastFetchTime < CACHE_TTL)) {
+    return cachedImgList;
+  }
+  
+  const response = await fetch(jsonUrl);
+  if (!response.ok) throw new Error("Failed to fetch JSON config");
+  
+  cachedImgList = await response.json();
+  lastFetchTime = now;
+  return cachedImgList;
+}
+
+
 async function extractSearch(urlSearch, request) {
   let searchParams = new URLSearchParams(urlSearch);
   let id = searchParams.get('id');
@@ -72,21 +94,23 @@ async function extractSearch(urlSearch, request) {
   let type = searchParams.get('type');
   let device = searchParams.get('device');
   let returnForm = searchParams.get('form');
-  //获取要排除的 ID 参数
   let notId = searchParams.get('not_id');
 
-  //处理图片格式
+  // 处理图片格式
   if (!returnForm) {
     returnForm = 'jpg';
   } else if (returnForm !== 'jpg' && !availableExtraForms.includes(returnForm)) {
     return error("Invalid image format: " + returnForm);
   }
 
-  //获取 JSON 配置
-  const response = await fetch(jsonUrl);
-  if (!response.ok) return error("Failed to fetch JSON config");
+  // 获取 JSON 配置 (使用缓存函数)
+  let imgList;
+  try {
+      imgList = await getOrFetchJson();
+  } catch (e) {
+      return error(e.message);
+  }
   
-  const imgList = await response.json();
   let availableCategories = Object.keys(imgList);
 
   let candidateCats = [];
@@ -102,7 +126,7 @@ async function extractSearch(urlSearch, request) {
   const category = candidateCats[Math.floor(Math.random() * candidateCats.length)];
   const selectedList = imgList[category];
 
-  //处理设备
+  // 处理设备与混合池
   let selectedDevice = device;
   let values = [];
   let isMixedPool = false;
@@ -113,6 +137,7 @@ async function extractSearch(urlSearch, request) {
           let imgs = selectedList[devKey];
           if (Array.isArray(imgs)) {
               imgs.forEach(imgItem => {
+                  // { i: (字符串或对象), d: 设备名 }
                   values.push({ i: imgItem, d: devKey });
               });
           }
@@ -130,14 +155,15 @@ async function extractSearch(urlSearch, request) {
       values = selectedList[selectedDevice];
   }
 
+  // ID处理 + 去重
   let trueId;
-  let img;
-
+  
   if (searchParams.has('id')) {
       let reqId = parseInt(id);
       if (isNaN(reqId) || reqId < 1 || reqId > values.length) return error("ID out of range");
       trueId = reqId - 1;
   } else {
+      // 随机去重
       if (values.length <= 1) {
           trueId = 0;
       } else {
@@ -145,31 +171,48 @@ async function extractSearch(urlSearch, request) {
           do {
               trueId = Math.floor(Math.random() * values.length);
               attempts++;
-          } while (
-              notId && 
-              parseInt(notId) - 1 === trueId && 
-              attempts < 10
-          );
+          } while (notId && parseInt(notId) - 1 === trueId && attempts < 10);
       }
   }
 
+  // 处理对象结构)
   let rawItem = values[trueId];
+  let imgPath = "";
+  let metaData = {}; // 存储图片的额外信息
+
+  const parseItem = (item) => {
+      if (typeof item === 'object' && item !== null) {
+          // 如果是对象，src 是路径，其他是元数据
+          let { src, ...rest } = item; 
+          return { path: src, meta: rest };
+      } else {
+          // 是字符串
+          return { path: item, meta: {} };
+      }
+  };
 
   if (isMixedPool) {
-      img = rawItem.i;
-      selectedDevice = rawItem.d; 
+      let parsed = parseItem(rawItem.i);
+      imgPath = parsed.path;
+      metaData = parsed.meta;
+      selectedDevice = rawItem.d;
   } else {
-      img = rawItem;
+      let parsed = parseItem(rawItem);
+      imgPath = parsed.path;
+      metaData = parsed.meta;
   }
 
+  // 传递metaData
   if (type === '302') {
-    return redirect(trueId + 1, img, category, selectedDevice, returnForm, request, searchParams);
+    return redirect(trueId + 1, imgPath, category, selectedDevice, returnForm, request, searchParams);
   } 
   else if (type === 'json') {
-    return typejson(trueId + 1, img, category, selectedDevice, returnForm, request, searchParams);
+    // metaData传给typejson
+    return typejson(trueId + 1, imgPath, category, selectedDevice, returnForm, request, searchParams, metaData);
   } 
   else if (!type) {
-    return image(img, returnForm, category, selectedDevice, searchParams);
+    // metaData传给image
+    return image(imgPath, returnForm, category, selectedDevice, searchParams, metaData);
   } 
   else {
     return error("Invalid type parameter");
@@ -228,48 +271,33 @@ function getCdnProxyUrl(githubUrl, returnForm, searchParams) {
 }
 
 
-async function image(img, returnForm, category, device, searchParams) {
+async function image(img, returnForm, category, device, searchParams, metaData) {
   let githubUrl = getGithubSourceUrl(img, returnForm);
   let fetchUrl = getCdnProxyUrl(githubUrl, returnForm, searchParams);
-  
   let contentType = returnForm === 'jpg' ? 'image/jpeg' : `image/${returnForm}`;
+  const browserUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
+  let response = await fetch(fetchUrl, { headers: { "User-Agent": browserUA, "Referer": "https://github.com/" } });
   
-  const browserUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0";
-
-  let response = await fetch(fetchUrl, {
-      headers: {
-          "User-Agent": browserUA,
-          "Referer": "https://github.com/"
-      }
-  });
-
   if (!response.ok) {
       let fallbackUrl = getGithubSourceUrl(img, 'jpg');
-      
-      response = await fetch(fallbackUrl, {
-          headers: {
-              "User-Agent": browserUA
-          }
-      });
-
-      if (response.ok) {
-          contentType = 'image/jpeg';
-          
-          response = new Response(response.body, response);
-          response.headers.set('X-Image-Source', 'Fallback-GitHub-Raw');
-      } 
-      else {
-          return error(`Image Load Failed: CDN(${fetchUrl}) & Fallback(${fallbackUrl})`);
-      }
+      response = await fetch(fallbackUrl, { headers: { "User-Agent": browserUA } });
+      if (response.ok) contentType = 'image/jpeg';
+      else return error(`Image Load Failed`);
   }
 
   let newHeaders = new Headers(response.headers);
   newHeaders.set('Content-Type', contentType);
   newHeaders.set('X-Image-Category', category);
   newHeaders.set('X-Image-Device', device);
-  newHeaders.set('Access-Control-Expose-Headers', 'X-Image-Category, X-Image-Device');
-  newHeaders.set('Cache-Control', 'public, max-age=7200');
   
+  if (metaData) {
+      if (metaData.title) newHeaders.set('X-Image-Title', encodeURIComponent(metaData.title));
+      if (metaData.author) newHeaders.set('X-Image-Author', encodeURIComponent(metaData.author));
+  }
+
+  newHeaders.set('Access-Control-Expose-Headers', 'X-Image-Category, X-Image-Device, X-Image-Title, X-Image-Author');
+  newHeaders.set('Cache-Control', 'public, max-age=3600');
   newHeaders.set('Access-Control-Allow-Origin', '*');
   newHeaders.set('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
   newHeaders.set('Access-Control-Allow-Headers', '*');
@@ -305,15 +333,13 @@ function redirect(id, img, category, device, returnForm, request, searchParams) 
 }
 
 
-function typejson(id, img, category, device, returnForm, request, searchParams) {
+function typejson(id, img, category, device, returnForm, request, searchParams, metaData) {
   let nowUrl = new URL(request.url);
   let myHost = nowUrl.hostname;
   let githubUrl = getGithubSourceUrl(img, returnForm);
   
   let extraQuery = getExtraQueryString(searchParams);
-
   let workerUrl = "https://" + myHost + "/api" + "?cat=" + category + "&device=" + device + "&id=" + id + "&form=" + returnForm + extraQuery;
-  
   let proxyUrl = getCdnProxyUrl(githubUrl, returnForm, searchParams);
 
   return new Response(
@@ -324,7 +350,8 @@ function typejson(id, img, category, device, returnForm, request, searchParams) 
       "form": returnForm,
       "githubUrl": githubUrl,
       "workerUrl": workerUrl,
-      "proxyUrl": proxyUrl
+      "proxyUrl": proxyUrl,
+      "metadata": metaData  //图片拥有的额外信息
     }, null, 2), {
     headers: { 
         'Content-Type': 'application/json',
@@ -333,12 +360,14 @@ function typejson(id, img, category, device, returnForm, request, searchParams) 
   });
 }
 
+
 function type302(redirectUrl) {
   return new Response("", {
     status: 302,
     headers: { Location: redirectUrl }
   });
 }
+
 
 async function error(reason = "Unknown Error") {
   let htmlContent = "";
