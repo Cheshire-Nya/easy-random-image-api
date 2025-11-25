@@ -1,29 +1,82 @@
 {
-    "category1": {
-      "mobile": [
-        "demoimg/bb",
-		"1",
-        "2",
-		"7",
-		"8",
-		"10"
-      ],
-      "pc": [
-	    "demoimg/aa",
-        "demoimg/cc"
-      ]
-    },
-    "category2": {
-      "mobile": [
-	    "3",
-		"4",
-        "5",
-        "6",
-		"9"
-      ],
-      "pc": [
-        "demoimg/dd",
-        "demoimg/ee"
-      ]
-    }
+  "cat1_mobile_bb": {
+    "src": "demoimg/bb.jpg",
+    "category": ["category1","category2"],
+    "device": ["mobile"]
+  },
+  "cat1_mobile_1": {
+    "src": "1.jpg",
+    "category": ["category1"],
+    "device": ["mobile"]
+  },
+  "cat1_mobile_2": {
+    "src": "2.jpg",
+    "category": ["category1","category2"],
+    "device": ["mobile"]
+  },
+  "cat1_mobile_7": {
+    "src": "7.jpg",
+    "category": ["category1"],
+    "device": ["mobile"]
+  },
+  "cat1_mobile_8": {
+    "src": "8.jpg",
+    "category": ["category1"],
+    "device": ["mobile"]
+  },
+  "cat1_mobile_10": {
+    "src": "10.jpg",
+    "category": ["category1"],
+    "device": ["mobile"]
+  },
+  "cat1_pc_aa": {
+    "src": "demoimg/aa.jpg",
+    "category": ["category1"],
+    "device": ["pc"]
+  },
+  "cat1_pc_cc": {
+    "src": "demoimg/cc.jpg",
+    "category": ["category1"],
+    "device": ["pc"]
+  },
+  "cat2_mobile_3": {
+    "src": "3.jpg",
+    "category": ["category2"],
+    "device": ["mobile"]
+  },
+  "cat2_mobile_4": {
+    "src": "4.jpg",
+    "category": ["category2"],
+    "device": ["mobile"]
+  },
+  "cat2_mobile_5": {
+    "src": "5.jpg",
+    "category": ["category2"],
+    "device": ["mobile"]
+  },
+  "cat2_mobile_6": {
+    "src": "6.jpg",
+    "category": ["category2"],
+    "device": ["mobile"]
+  },
+  "cat2_mobile_9": {
+    "src": "9.jpg",
+    "category": ["category2"],
+    "device": ["mobile"]
+  },
+  "cat2_pc_dd": {
+    "src": "demoimg/dd.jpg",
+    "category": ["category2"],
+    "device": ["pc"]
+  },
+  "cat2_pc_ee": {
+    "src": "demoimg/ee.jpg",
+    "category": ["category2"],
+    "device": ["pc"]
+  },
+  "keli_01": {
+    "src": "可莉/要和可莉一起睡午觉嘛_83005448.jpg",
+    "category": ["category2","可莉"],
+    "device": ["mobile"]
+  }
 }
