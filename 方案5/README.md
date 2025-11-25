@@ -5,7 +5,7 @@
 ## 📖 简介 | Introduction
 利用 Cloudflare Workers 的无服务器特性，配合 GitHub 仓库作为存储后端，构建了一个零成本、响应速度极快的随机图片 API。不仅支持多分类管理，还通过集成 CDN 实现实时的图片压缩、格式转换和裁剪，非常适合用于网站背景、博客配图或小程序开发。
 
-**快给我点star**
+**快给我点star ⭐️**
 
 ## ✨ 项目特性 | Features
 - **⚡️ Serverless 架构**：完全运行在 Cloudflare Workers 上，依托全球边缘网络，极低延迟，无需购买服务器。
@@ -115,7 +115,7 @@ const url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image
 // 注意：地址末尾必须带 "/"
 const repoConfig = {
     // 必须保留 default
-    "default": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/",
+    "default": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/jpg/",
     
     // 可选：其他仓库
     "genshin": "https://raw.githubusercontent.com/Cheshire-Nya/random-genshin-img/main/"
@@ -126,19 +126,12 @@ const redirectProxy = 2;
 // 0 = GitHub 直链 (不推荐，国内访问慢)
 // 1 = Worker 代理 (消耗 Worker 流量及次数)
 // 2 = 第三方 CDN 代理 (使用 wsrv.nl 加速)
-<!--
-const resizeHost = "https://wsrv.nl/?url=";
-// 统一使用的图片处理/代理 CDN
--->
 
 const availableExtraForms = ["webp"];
-//除默认的jpg外，你额外增加的可以返回的图片格式
-
-<!--
-const availableDevices = ["mobile", "pc"];
-//一般不需要改这个了，改了就要改代码，如果可以更加细分设备，欢迎pr
--->
+//除jpg以外可以返回的图片格式
+//下次更新时会去除掉此变量，对于现在的代码是有害无益的
 ```
+
 **【注意】上述url中的所有中文都需写成utf8编码形式，不然会一直给你丢到404，比如我的json地址是"/方案5/image.json"写成了"/%E6%96%B9%E6%A1%885/image.json"**
 
 
@@ -156,77 +149,95 @@ const availableDevices = ["mobile", "pc"];
     <tr>
       <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
       <td><code>JSON Key</code></td>
-      <td>指定分类。<span class="tag-tip">留空则随机全分类。</span></td>
+      <td>指定分类。<span class="tag-tip">留空则在所有分类中随机抽取。</span></td>
     </tr>
     <tr>
       <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>pc/mobile</code><br><code>invalid</code></td>
-      <td><strong>invalid</strong>: 全池随机。<span class="tag-tip">留空自动判断设备。</span></td>
+      <td><code>pc</code><br><code>mobile</code><br><code>invalid</code></td>
+      <td>
+        <strong>pc/mobile</strong>: 强制筛选特定设备。<br>
+        <strong>invalid</strong>: 全池随机模式（混合所有设备图）。<br>
+        <span class="tag-tip">留空则根据 User-Agent 自动判断。</span>
+      </td>
     </tr>
     <tr>
       <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>302</code><br><code>json</code></td>
-      <td><strong>json</strong>: 返回元数据。<br><strong>(空)</strong>: 直接返回图片。</td>
+      <td><code>302</code><br><code>json</code><br><code>(空)</code></td>
+      <td>
+        <strong>302</strong>: 跳转到图片真实地址 (默认)。<br>
+        <strong>json</strong>: 返回包含图片信息、CDN链接、元数据的 JSON。<br>
+        <strong>(空)</strong>: 直接返回图片二进制流。
+      </td>
     </tr>
     <tr>
       <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>Integer</code></td>
-      <td>获取第 N 张图。<span class="tag-warn">⚠️ 建议配合 device 使用。</span></td>
+      <td><code>Integer</code> / <code>String</code></td>
+      <td>
+        <strong>数字</strong>: 获取筛选结果中的第 N 张图。<br>
+        <strong>字符串</strong>: 直接获取指定 Key 的图片 (如 <code>id=miku_01</code>)。
+      </td>
+    </tr>
+    <tr>
+      <td><strong>not_id</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>String (Key)</code></td>
+      <td>
+        传入当前图片的 Key (如 <code>keli_01</code>)。<br>
+        <span class="tag-tip">API 将确保随机出的下一张图不是这张 (用于去重)。</span>
+      </td>
     </tr>
     <tr>
       <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
-      <td><code>webp/jpg</code></td>
-      <td>指定格式 (支持自动转码)。</td>
+      <td><code>webp</code> / <code>jpg</code></td>
+      <td>指定返回格式。系统会自动判断是否需要通过 CDN 转码。</td>
     </tr>
     <tr>
       <td><strong>CDN参数</strong><br><span class="tag tag-opt">透传</span></td>
       <td><code>w</code>, <code>h</code>, <code>q</code>...</td>
       <td>
-        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的所有参数。<br>
-        例: <code>w=200</code> (宽200), <code>q=80</code> (质量80)<br>
-		但为了保持对本地存储额外格式图片的支持，<code>output</code>是无效的
+        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的所有处理参数。<br>
+        例: <code>w=200</code> (宽200), <code>q=75</code> (质量75), <code>fit=cover</code>
       </td>
     </tr>
   </tbody>
 </table>
 
-### 示例
+### 🔗 调用示例
 
-[https://demo5.randomimg.sfacg.ltd](https://demo5.randomimg.sfacg.ltd)主页
+- **主页**：[https://demo5.randomimg.sfacg.ltd](https://demo5.randomimg.sfacg.ltd)
 
-[https://demo5.randomimg.sfacg.ltd/api?filt=greyscale](https://demo5.randomimg.sfacg.ltd/api?filt=greyscale)输出黑白滤镜【在使用cdn代理图片时】
+- **随机获取一张图 (自动适配设备)**：[https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)
 
-[https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)不带参数自动判断设备无视分类抽取
+- **随机获取一张category1分类的图**：[https://demo5.randomimg.sfacg.ltd/api?cat=category1](https://demo5.randomimg.sfacg.ltd/api?cat=category1)
 
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1](https://demo5.randomimg.sfacg.ltd/api?cat=category1)无form默认jpg，无device自动识别设备类型
+- **获取一张 WebP 格式、质量 75 的图**：[https://demo5.randomimg.sfacg.ltd/api?form=webp&q=75](https://demo5.randomimg.sfacg.ltd/api?form=webp&q=75)category1分类webp，自动识别设备类型
 
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp](https://demo5.randomimg.sfacg.ltd/api?cat=category1&form=webp)category1分类webp，自动识别设备类型
+- **禁用设备判断，无视分类全池抽取**：[https://demo5.randomimg.sfacg.ltd/api?device=invalid](https://demo5.randomimg.sfacg.ltd/api?device=invalid)
 
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2](https://demo5.randomimg.sfacg.ltd/api?cat=category1&cat=category2)多分类抽取自动识别设备类型
+- **获取图片的详细 JSON 信息**：[https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json](https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json)随机抽取`category2`分类并返回json
 
-[https://demo5.randomimg.sfacg.ltd/api?device=invalid](https://demo5.randomimg.sfacg.ltd/api?device=invalid)禁用设备判断，无视分类全池抽取
+- **防止获取到 ID 为 miku_01 的图 (去重)：**[https://demo5.randomimg.sfacg.ltd/api?not_id=keli_01](https://demo5.randomimg.sfacg.ltd/api?not_id=keli_01)
 
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2](https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=mobile&id=2)抽取`image.json`中`category1`分类适合移动端查看的第2张图
-
-[https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json](https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json)随机抽取`category2`分类并返回json
-
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=pc&id=2&type=json](https://demo5.randomimg.sfacg.ltd/api?cat=category1&device=pc&id=2&type=json)指定`category1`分类适合pc端的第二张并返回json
-
-[https://demo5.randomimg.sfacg.ltd/api?cat=category1&type=302](https://demo5.randomimg.sfacg.ltd/api?cat=category1&type=302)以302返回跳转到随机一张图的准确地址
+- **302跳转到随机一张图的准确地址**：[https://demo5.randomimg.sfacg.ltd/api?type=302](https://demo5.randomimg.sfacg.ltd/api?type=302)
 
 PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演示站是添加的自定义域名
 
 ### 响应/错误返回说明
-- json返回会包含如下内容
+- 📦 JSON 响应示例
 ```
 {
-  "category": "category1",
-  "device": "mobile",
-  "id": 5,
+  "categories": ["anime", "miku"], // 图片所属分类
+  "device": "mobile",              // 图片所属设备
+  "id": 5,                         // 在当前筛选列表中的索引
+  "key": "miku_v4",                // 图片的唯一 Key (ID)
+  "repo": "default",               // 来源仓库
   "form": "webp",
-  "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/jpg/8.jpg",
-  "workerUrl": "https://test.sfacg.ltd/api?cat=category1&device=mobile&id=5&form=webp",
-  "proxyUrl": "https://wsrv.nl/?url=https%3A%2F%2Fraw.githubusercontent.com%2FCheshire-Nya%2Feasy-random-image-api%2Fmain%2F%25E6%2596%25B9%25E6%25A1%25885%2Fjpg%2F8.jpg&output=webp"
+  "githubUrl": "https://raw.githubusercontent.com/.../miku_v4.jpg",
+  "workerUrl": "https://api.site/api?cat=anime&id=miku_v4&form=webp",
+  "proxyUrl": "https://wsrv.nl/?url=...&output=webp",
+  "metadata": {                    // image.json 中定义的额外信息
+    "title": "初音未来 V4",
+    "author": "iXima"
+  }
 }
 ```
 
@@ -251,6 +262,19 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 	Redirect Config Error
 	404 Template not found
 
+## 🛠️ 常见问题 (FAQ)
+	
+**1.为什么返回 403 Forbidden？**
+	- 通常是因为目标图片服务（GitHub 或 CDN）拦截了请求。本项目已内置 User-Agent 伪装，但如果你在浏览器直接访问 GitHub Raw 链接也打不开，说明是网络问题或仓库私有。请确保 GitHub 仓库是 Public 的。
+
+**2.CDN 图片加载失败怎么办？**
+	- 程序内置了 自动降级 (Fallback) 机制。如果 CDN (wsrv.nl) 请求失败（403/404/500），Worker 会自动尝试直接从 GitHub 获取原始图片，并修正 Content-Type 返回给用户。
+
+**3.关于免费额度**
+	- Cloudflare Workers 免费版每天有 100,000 次 请求额度。
+
+	-本项目已针对性优化：图片资源设置了 Cache-Control: max-age=3600，CORS 预检设置了 24 小时缓存。这意味着浏览器缓存命中时不消耗 Worker 额度。
+	
 ## PS
 
 - 不知道还有啥问题，如果遇到了可以提issue
@@ -260,12 +284,3 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 2. cloudflare注册没有花里胡哨的各种认证，超低门槛，有邮箱就能注册。
 
 3. 理论上可以无限白嫖，多注册几个账号，其他服务调用随机图时多写个逻辑返回错误请求另外的接口即可。唯一的成本是大陆访问需要绑自定义域名，但是域名可以白嫖免费域名或者一年十几二十块的便宜域名，四舍五入就是妹花钱。添加自定义域在[Cloudflare控制台](https://dash.cloudflare.com/)中`网站`里按指引操作，选择free计划即可。
-
-4. ~~错误返回偷懒没完善~~
-
-5. **主页和404页没啥卵用，建议用的时候删了**
-
-
-
-
-
