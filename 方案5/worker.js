@@ -72,13 +72,17 @@ async function extractSearch(urlSearch, request) {
   let type = searchParams.get('type');
   let device = searchParams.get('device');
   let returnForm = searchParams.get('form');
+  //获取要排除的 ID 参数
+  let notId = searchParams.get('not_id');
 
+  //处理图片格式
   if (!returnForm) {
     returnForm = 'jpg';
   } else if (returnForm !== 'jpg' && !availableExtraForms.includes(returnForm)) {
     return error("Invalid image format: " + returnForm);
   }
 
+  //获取 JSON 配置
   const response = await fetch(jsonUrl);
   if (!response.ok) return error("Failed to fetch JSON config");
   
@@ -98,6 +102,7 @@ async function extractSearch(urlSearch, request) {
   const category = candidateCats[Math.floor(Math.random() * candidateCats.length)];
   const selectedList = imgList[category];
 
+  //处理设备
   let selectedDevice = device;
   let values = [];
   let isMixedPool = false;
@@ -133,7 +138,19 @@ async function extractSearch(urlSearch, request) {
       if (isNaN(reqId) || reqId < 1 || reqId > values.length) return error("ID out of range");
       trueId = reqId - 1;
   } else {
-      trueId = Math.floor(Math.random() * values.length);
+      if (values.length <= 1) {
+          trueId = 0;
+      } else {
+          let attempts = 0;
+          do {
+              trueId = Math.floor(Math.random() * values.length);
+              attempts++;
+          } while (
+              notId && 
+              parseInt(notId) - 1 === trueId && 
+              attempts < 10
+          );
+      }
   }
 
   let rawItem = values[trueId];
