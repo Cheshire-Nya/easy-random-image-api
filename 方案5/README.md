@@ -10,7 +10,9 @@
 ## ✨ 项目特性 | Features
 - **⚡️ Serverless 架构**：完全运行在 Cloudflare Workers 上，依托全球边缘网络，极低延迟，无需购买服务器。
 
-- **🖼️ GitHub 图床集成**：图片资源托管在 GitHub 仓库，通过 JSON 配置文件灵活管理分类，维护简单。
+- **📦 多仓库存储**：支持挂载多个 GitHub 仓库，通过统一的 JSON 文件管理所有资源，突破单仓库体积限制。
+
+- **🗂️ 灵活的标签系统**：图片采用扁平化 Key-Value 结构管理，支持多分类标签 (category) 和设备标签 (device)，一张图可属于多个分类。
 
 - **📱 智能设备适配**：
 
@@ -23,6 +25,14 @@
    内置 CDN 代理（wsrv.nl），支持 URL 参数透传。
 
    无需处理原图，通过 API 参数即可实时控制图片宽 (w)、高 (h)、质量 (q)、裁剪 (fit) 及格式转换 (form=webp)。
+   
+- **🛡️ 高可用设计**：
+
+	智能降级：当 CDN 服务不可用时，自动回源 GitHub 直链，并根据文件后缀动态修正 Content-Type。
+
+	防重复：支持 not_id 参数，确保连续请求不出现同一张图。
+
+	全局缓存：Worker 级缓存 JSON 配置，减少 GitHub 请求频率。
 
 - **🔀 多种响应模式**：
 
@@ -36,54 +46,98 @@
 
 ## 部署和使用
 
-Github随便新建个公开仓库，新建文件夹`jpg`和其他你想要的格式对应的文件夹，jpg图片塞进jpg文件夹这样
-其他格式图片可以自行上传，且不同格式图片文件夹的目录结构、文件名须保持一致，目录格式参照本文件夹下的`jpg`，`webp`
-图片批量转码和压缩推荐使用[caesium](https://saerasoft.com/caesium#downloads)，可以保留目录结构转码压缩
-也可将`imgResize`置1以使用第三方cdn来转码
+1. 准备图片仓库
 
-参照`image.json`编写你自己的json文件，随便放哪里，仓库、其他网站目录或服务器都行，只要能通过公网访问到即可
+	你可以使用现有的公开 GitHub 仓库，或者新建一个。
 
-Cloudflare Worker首页：https://workers.cloudflare.com
+	图片可以存放在仓库的任意目录下。
 
-注册，登陆，`start building`，取一个worker子域名，`创建服务`，不需要使用模板创建worker，直接hello world创建即可。
+	不再强制要求特定的文件夹结构（如 /jpg/），只需在 JSON 中填写完整路径（包含后缀）即可。
 
-进入编辑后复制本文件夹下的 `worker.js` 到左侧代码框，**按照代码中的注释和自己的需求修改代码**，`保存并部署`。
+2. 编写图片信息文件 (image.json)
 
-### 配置
+	创建一个 image.json 文件（放在仓库或任意可公网访问的地方）。采用扁平化键值对结构：
+
+	```
+	{
+	  "unique_id_01": {
+		"src": "mobile/1.jpg",
+		"category": ["anime", "mobile"],
+		"device": ["mobile"]
+	  },
+	  "unique_id_02": {
+		"src": "wallpapers/sky.png",
+		"title": "高清蓝天",
+		"repo": "backup_repo", 
+		"category": ["scenery", "blue"],
+		"device": ["pc"]
+	  }
+	}
+	```
+
+	- Key: 图片的唯一标识（ID）。
+
+	- src: 图片在仓库中的相对路径（必须包含后缀，如 .jpg, .png）。
+
+	- repo: (可选) 指定该图片所在的仓库 Key（需在 Worker 代码中配置），默认使用 default。
+
+	- category: (数组) 图片所属的分类标签。
+
+	- device: (数组) 适配的设备类型 (mobile, pc)。
+
+3. 部署 Cloudflare Worker
+	访问 [Cloudflare Workers](https://workers.cloudflare.com)。
+
+	创建服务 (Create Service) -> Hello World 模板。
+
+	复制本项目 worker.js 的全部代码到编辑器中。
+
+	修改顶部的配置区域（见下文）。
+
+	保存并部署。
+
+### ⚙️ Worker 配置说明
+
+请在 worker.js 顶部修改以下变量：
 
 ```
-var jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/image.json";
+const jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/image.json";
 // json文件的地址
 
-var urlIndex = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/index.html";
+const urlIndex = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/index.html";
 // 主页模板地址
 
-var url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/404.html";
+const url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/404.html";
 // 404模板地址
 
-var imgHost = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/";
-// 图片地址前部不会发生改变的部分
-// 用github作为图库应按照此格式"https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>/"
+// 多仓库映射表
+// 格式: "仓库标识": "仓库Raw地址前缀"
+// 注意：地址末尾必须带 "/"
+const repoConfig = {
+    // 必须保留 default
+    "default": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/",
+    
+    // 可选：其他仓库
+    "genshin": "https://raw.githubusercontent.com/Cheshire-Nya/random-genshin-img/main/"
+};
 
-var redirectProxy = 2;
+const redirectProxy = 2;
 // 代理模式（使用场景通常是type=302）: 
 // 0 = GitHub 直链 (不推荐，国内访问慢)
 // 1 = Worker 代理 (消耗 Worker 流量及次数)
 // 2 = 第三方 CDN 代理 (使用 wsrv.nl 加速)
-
-var imgResize = 1; 
-// 转码/路径开关: 
-// 0 = 本地模式 (GitHub 上必须存在对应格式的文件夹，如 /webp/，代理只负责搬运)
-// 1 = 云端模式 (GitHub 上只需有 jpg，其他格式由 CDN 在线转码)
-
-var resizeHost = "https://wsrv.nl/?url=";
+<!--
+const resizeHost = "https://wsrv.nl/?url=";
 // 统一使用的图片处理/代理 CDN
+-->
 
-var availableExtraForms = ["webp"];
+const availableExtraForms = ["webp"];
 //除默认的jpg外，你额外增加的可以返回的图片格式
 
-var availableDevices = ["mobile", "pc"];
+<!--
+const availableDevices = ["mobile", "pc"];
 //一般不需要改这个了，改了就要改代码，如果可以更加细分设备，欢迎pr
+-->
 ```
 **【注意】上述url中的所有中文都需写成utf8编码形式，不然会一直给你丢到404，比如我的json地址是"/方案5/image.json"写成了"/%E6%96%B9%E6%A1%885/image.json"**
 
