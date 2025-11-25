@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --glass-bg: rgba(30, 30, 30, 0.5);
+            --glass-bg: rgba(30, 30, 30, 0.6);
             --glass-border: rgba(255, 255, 255, 0.1);
             --text-color: #ffffff;
             --text-secondary: #cbd5e0;
@@ -74,16 +74,15 @@
             transition: opacity 0.6s ease-in; 
         }
 
-        #ui-toggle-btn {
+        .float-btn {
             position: fixed;
             top: 25px;
-            right: 25px;
             z-index: 100;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--glass-border);
-            width: 44px;
             height: 44px;
             border-radius: 12px;
+            color: var(--text-color);
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -91,21 +90,55 @@
             backdrop-filter: blur(4px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 1.2rem;
         }
-        
-        #ui-toggle-btn:hover {
-            background: rgba(0, 0, 0, 0.8); 
-            
+
+        .float-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        #ui-toggle-btn {
+            right: 25px;
+            width: 44px;
         }
 
         #ui-toggle-btn.is-active {
             background: rgba(0, 0, 0, 0.6);
         }
-        
-        #ui-toggle-btn.is-active:hover {
-            background: rgba(0, 0, 0, 0.9); 
+
+        #bg-refresh-btn {
+            left: 25px;
+            min-width: 44px;
+            padding: 0;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        #bg-refresh-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.9;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0 14px;
+            width: auto;
+            font-size: 0.9rem;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        #bg-refresh-btn:hover:not(:disabled) .icon-svg {
+            transform: rotate(180deg);
+        }
+
+        .icon-svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            transition: transform 0.5s ease;
         }
 
         .hamburger {
@@ -142,6 +175,39 @@
         #ui-toggle-btn.is-active .hamburger span:nth-child(3) {
             bottom: 50%;
             transform: translateY(50%) rotate(-45deg);
+        }
+
+        .hint-toast {
+            position: fixed;
+            top: 34px;
+            z-index: 99;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            white-space: nowrap;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        #hint-left { 
+            left: 80px;
+            transform: translateX(-20px); 
+        }
+        
+        #hint-right { 
+            right: 80px; 
+            transform: translateX(20px); 
+        }
+
+        .hint-visible {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
         }
 
         .container {
@@ -308,7 +374,16 @@
         <div id="static-image"></div>
     </div>
 
-    <button id="ui-toggle-btn" class="is-active" title="切换界面显示">
+    <div id="hint-left" class="hint-toast">⬅ 切换壁纸</div>
+    <div id="hint-right" class="hint-toast">隐藏界面 ➡</div>
+
+    <button id="bg-refresh-btn" class="float-btn" title="切换背景">
+        <svg class="icon-svg" viewBox="0 0 24 24">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+    </button>
+
+    <button id="ui-toggle-btn" class="float-btn is-active" title="切换界面显示">
         <div class="hamburger">
             <span></span>
             <span></span>
@@ -383,7 +458,7 @@
         </footer>
     </div>
 
-<script>
+    <script>
         function toggleDocs() {
             const section = document.getElementById('docs-section');
             const btn = document.getElementById('toggle-docs');
@@ -406,21 +481,34 @@
             uiToggleBtn.classList.toggle('is-active');
         });
 
-        (async function() {
-            const gradientEl = document.getElementById('default-gradient');
-            const glitchContainer = document.getElementById('glitch-container');
-            const staticImageEl = document.getElementById('static-image');
+        const gradientEl = document.getElementById('default-gradient');
+        const glitchContainer = document.getElementById('glitch-container');
+        const staticImageEl = document.getElementById('static-image');
+        const refreshBtn = document.getElementById('bg-refresh-btn');
+        const refreshIconSVG = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>`;
 
-            const screenW = Math.ceil(window.innerWidth * window.devicePixelRatio);
-            const screenH = Math.ceil(window.innerHeight * window.devicePixelRatio);
+        async function switchBackground() {
+            refreshBtn.disabled = true;
+            let timeLeft = 3;
+            refreshBtn.innerHTML = `${timeLeft}s`;
 
-            const apiUrl = `/api?type=json&w=${screenW}&h=${screenH}&fit=cover&q=75&form=webp`;
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    refreshBtn.innerHTML = `${timeLeft}s`;
+                } else {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
 
             const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 3000));
-
+            
             try {
+                const screenW = Math.ceil(window.innerWidth * window.devicePixelRatio);
+                const screenH = Math.ceil(window.innerHeight * window.devicePixelRatio);
+                const apiUrl = `/api?type=json&w=${screenW}&h=${screenH}&fit=cover&q=75`;
+
                 const res = await fetch(apiUrl);
-                
                 if (!res.ok) throw new Error('API Request failed');
                 const data = await res.json();
                 const imgUrl = data.proxyUrl || data.workerUrl;
@@ -434,6 +522,7 @@
 
                 await Promise.all([waitThreeSeconds, loadImages]);
 
+                glitchContainer.innerHTML = ''; 
                 const glitchWrapper = document.createElement('div');
                 glitchWrapper.className = 'glitch glitch--animate';
                 for (let i = 0; i < 5; i++) {
@@ -444,26 +533,57 @@
                 }
                 glitchContainer.appendChild(glitchWrapper);
 
-                staticImageEl.style.backgroundImage = `url('${imgUrl}')`;
+                glitchContainer.style.display = 'block';
+                glitchContainer.style.opacity = '1';
 
-                requestAnimationFrame(() => {
-                    gradientEl.style.opacity = '0'; 
-                    glitchContainer.style.opacity = '1';
-                });
+                staticImageEl.style.opacity = '0';
+                if (gradientEl.style.opacity !== '0') {
+                    gradientEl.style.opacity = '0';
+                }
 
                 setTimeout(() => {
-                    staticImageEl.style.opacity = '1'; 
+                    staticImageEl.style.backgroundImage = `url('${imgUrl}')`;
+                }, 800);
+
+                setTimeout(() => {
+                    staticImageEl.style.opacity = '1';
                 }, 2200);
 
                 setTimeout(() => {
-                    glitchContainer.style.display = 'none'; 
+                    glitchContainer.style.display = 'none';
                     glitchContainer.innerHTML = '';
-                }, 3000); 
+                    refreshBtn.disabled = false; 
+                    refreshBtn.innerHTML = refreshIconSVG;
+                }, 3000);
 
             } catch (e) {
                 console.warn('Background load failed:', e);
+                refreshBtn.innerHTML = "!";
+                setTimeout(() => {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = refreshIconSVG;
+                }, 2000);
             }
-        })();
+        }
+
+        refreshBtn.addEventListener('click', switchBackground);
+        window.addEventListener('load', switchBackground);
+
+        window.addEventListener('load', () => {
+            const hintLeft = document.getElementById('hint-left');
+            const hintRight = document.getElementById('hint-right');
+            
+            setTimeout(() => {
+                hintLeft.classList.add('hint-visible');
+                hintRight.classList.add('hint-visible');
+            }, 500);
+
+            setTimeout(() => {
+                hintLeft.classList.remove('hint-visible');
+                hintRight.classList.remove('hint-visible');
+            }, 3000);
+        });
+
     </script>
 </body>
 </html>
