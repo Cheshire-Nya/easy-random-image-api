@@ -22,12 +22,8 @@ const redirectProxy = 2;
 // 1 = Worker 代理 (消耗 Worker 流量及次数)
 // 2 = 第三方 CDN 代理 (使用 wsrv.nl 加速)
 
-
 const resizeHost = "https://wsrv.nl/?url=";
 // 统一使用的图片处理/代理 CDN
-
-const availableExtraForms = ["webp"];
-//除默认的jpg外，你额外增加的可以返回的图片格式
 
 const availableDevices = ["mobile", "pc"];
 //一般不需要改这个了，改了就要改代码，如果可以更加细分设备，欢迎pr
@@ -91,8 +87,6 @@ async function extractSearch(urlSearch, request) {
 
   if (!returnForm) {
     returnForm = 'jpg';
-  } else if (returnForm !== 'jpg' && !availableExtraForms.includes(returnForm)) {
-    return error("Invalid image format: " + returnForm);
   }
 
   let imgDB;
@@ -271,7 +265,7 @@ async function image(img, returnForm, category, device, searchParams, metaData, 
           }
       } 
       else {
-          return error(`Image Load Failed`);
+          return error(`Image Load Failed. Target: ${fallbackUrl} Status: ${response.status}`);
       }
   }
 

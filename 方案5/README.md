@@ -68,7 +68,7 @@
 	  "unique_id_02": {
 		"src": "wallpapers/sky.png",
 		"title": "高清蓝天",
-		"repo": "backup_repo", 
+		"repo": "scenery_repo", 
 		"category": ["scenery", "blue"],
 		"device": ["pc"]
 	  }
@@ -126,10 +126,6 @@ const redirectProxy = 2;
 // 0 = GitHub 直链 (不推荐，国内访问慢)
 // 1 = Worker 代理 (消耗 Worker 流量及次数)
 // 2 = 第三方 CDN 代理 (使用 wsrv.nl 加速)
-
-const availableExtraForms = ["webp"];
-//除jpg以外可以返回的图片格式
-//下次更新时会去除掉此变量，对于现在的代码是有害无益的
 ```
 
 **【注意】上述url中的所有中文都需写成utf8编码形式，不然会一直给你丢到404，比如我的json地址是"/方案5/image.json"写成了"/%E6%96%B9%E6%A1%885/image.json"**
