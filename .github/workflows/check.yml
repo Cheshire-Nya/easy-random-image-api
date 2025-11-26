@@ -1,0 +1,26 @@
+name: Check
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'image.json'
+      - 'scripts/**'
+      - '.github/workflows/check.yml'
+
+jobs:
+  check-json:
+    runs-on: ubuntu-latest
+    name: 🔍 Check JSON Integrity
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run Validation Script
+        run: python scripts/validate_json.py
