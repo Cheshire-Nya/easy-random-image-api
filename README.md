@@ -46,6 +46,63 @@
 
 ## 部署和使用
 
+- **快速部署**
+
+1.准备仓库以及资源
+
+	Fork本仓库后只需要保留 wrangler.toml、worker.js以及html-template
+
+	随后在worker.js顶部配置区域中修改变量（见下文配置说明）
+
+	并在仓库中存放你的图片资源
+  
+2. 创建并编写图片信息文件 (image.json)
+
+	创建一个 image.json 文件（放在仓库或任意可公网访问的地方）。采用扁平化键值对结构：
+
+	```
+	{
+	  "unique_id_01": {
+		"src": "mobile/1.jpg",
+		"category": ["anime", "mobile"],
+		"device": ["mobile"]
+	  },
+	  "unique_id_02": {
+		"src": "wallpapers/sky.png",
+		"title": "高清蓝天",
+		"repo": "scenery_repo", 
+		"category": ["scenery", "blue"],
+		"device": ["pc"]
+	  }
+	}
+	```
+
+	- Key: 图片的唯一标识（ID）。
+
+	- src: 图片在仓库中的相对路径（必须包含后缀，如 .jpg, .png）。
+
+	- repo: (可选) 指定该图片所在的仓库 Key（需在 Worker 代码中配置），默认使用 default。
+
+	- category: (数组) 图片所属的分类标签。
+
+	- device: (数组) 适配的设备类型 (mobile, pc)。
+
+3.部署 Cloudflare Worker
+  
+  	访问 [Cloudflare Workers](https://workers.cloudflare.com)。
+
+	创建应用程序 -> Continue with GitHub
+
+	验证绑定github用户后选择上两步准备的仓库 -> 下一步
+
+	项目名称可以随意取，其他选项参数均不需要修改 -> 部署
+
+	第一次部署后，cloudflare机器人会对仓库提出pr以修正 wrangler.toml 中应用名称的错误，直接合并请求
+
+	以后每次对仓库main分支修改后cloudflare都会自动重新部署代码
+
+- **传统部署**
+	
 1. 准备图片仓库
 
 	你可以使用现有的公开 GitHub 仓库，或者新建一个。
@@ -88,7 +145,7 @@
 3. 部署 Cloudflare Worker
 	访问 [Cloudflare Workers](https://workers.cloudflare.com)。
 
-	创建服务 (Create Service) -> Hello World 模板。
+	创建应用程序 (Create Service) -> Hello World 模板。
 
 	复制本项目 worker.js 的全部代码到编辑器中。
 
