@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - '/**'
+      - 'worker.js'
       - 'wrangler.toml'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   deploy:
