@@ -46,18 +46,21 @@
 
 ## 部署和使用
 
-
 **快速部署**
 
-1.准备仓库以及资源
+	1.准备仓库以及资源
 
-	Fork本仓库后只需要保留 wrangler.toml、worker.js以及html-template
+	Fork本仓库后需要保留 wrangler.toml、worker.js
+	
+	以及html-template/...、scripts/validate_json.py、.github/check.yml
 
 	随后在worker.js顶部配置区域中修改变量（见下文配置说明）
 
 	并在仓库中存放你的图片资源
+	
+	最后确认scripts/validate_json.py、.github/check.yml中的路径正确以保证image.json自动校验正常运行
   
-2. 创建并编写图片信息文件 (image.json)
+	2. 创建并编写图片信息文件 (image.json)
 
 	创建一个 image.json 文件（放在仓库或任意可公网访问的地方）。采用扁平化键值对结构：
 
@@ -88,7 +91,7 @@
 
 	- device: (数组) 适配的设备类型 (mobile, pc)。
 
-3.部署 Cloudflare Worker
+	3.部署 Cloudflare Worker
   
   	访问 [Cloudflare Workers](https://workers.cloudflare.com)。
 
@@ -101,11 +104,13 @@
 	第一次部署后，cloudflare机器人会对仓库提出pr以修正 wrangler.toml 中应用名称的错误，直接合并请求
 
 	以后每次对仓库main分支修改后cloudflare都会自动重新部署代码
+	
+	同时系统会自动检查 image.json 是否有重复 Key。如果发现重复，GitHub 会发送邮件通知你（且不影响正常部署）。
 
 
 **传统部署**
 	
-1. 准备图片仓库
+	1. 准备图片仓库
 
 	你可以使用现有的公开 GitHub 仓库，或者新建一个。
 
@@ -113,7 +118,7 @@
 
 	不再强制要求特定的文件夹结构（如 /jpg/），只需在 JSON 中填写完整路径（包含后缀）即可。
 
-2. 编写图片信息文件 (image.json)
+	2. 编写图片信息文件 (image.json)
 
 	创建一个 image.json 文件（放在仓库或任意可公网访问的地方）。采用扁平化键值对结构：
 
@@ -144,7 +149,8 @@
 
 	- device: (数组) 适配的设备类型 (mobile, pc)。
 
-3. 部署 Cloudflare Worker
+	3. 部署 Cloudflare Worker
+	
 	访问 [Cloudflare Workers](https://workers.cloudflare.com)。
 
 	创建应用程序 (Create Service) -> Hello World 模板。
