@@ -1,16 +1,18 @@
 # easy-random-img-api
 
-请移步[方案5](https://github.com/Cheshire-Nya/easy-random-image-api/tree/main/%E6%96%B9%E6%A1%885)
-
 一个基于 Cloudflare Workers 的轻量级、高性能随机图片 API 服务。
 
 ## 📖 简介 | Introduction
 利用 Cloudflare Workers 的无服务器特性，配合 GitHub 仓库作为存储后端，构建了一个零成本、响应速度极快的随机图片 API。不仅支持多分类管理，还通过集成 CDN 实现实时的图片压缩、格式转换和裁剪，非常适合用于网站背景、博客配图或小程序开发。
 
+**快给我点star ⭐️**
+
 ## ✨ 项目特性 | Features
 - **⚡️ Serverless 架构**：完全运行在 Cloudflare Workers 上，依托全球边缘网络，极低延迟，无需购买服务器。
 
-- **🖼️ GitHub 图床集成**：图片资源托管在 GitHub 仓库，通过 JSON 配置文件灵活管理分类，维护简单。
+- **📦 多仓库存储**：支持挂载多个 GitHub 仓库，通过统一的 JSON 文件管理所有资源，突破单仓库体积限制。
+
+- **🗂️ 灵活的标签系统**：图片采用扁平化 Key-Value 结构管理，支持多分类标签 (category) 和设备标签 (device)，一张图可属于多个分类。
 
 - **📱 智能设备适配**：
 
@@ -23,6 +25,14 @@
    内置 CDN 代理（wsrv.nl），支持 URL 参数透传。
 
    无需处理原图，通过 API 参数即可实时控制图片宽 (w)、高 (h)、质量 (q)、裁剪 (fit) 及格式转换 (form=webp)。
+   
+- **🛡️ 高可用设计**：
+
+	智能降级：当 CDN 服务不可用时，自动回源 GitHub 直链，并根据文件后缀动态修正 Content-Type。
+
+	防重复：支持 not_id 参数，确保连续请求不出现同一张图。
+
+	全局缓存：Worker 级缓存 JSON 配置，减少 GitHub 请求频率。
 
 - **🔀 多种响应模式**：
 
@@ -34,131 +44,233 @@
 
 - **💻 现代化 UI**：提供一套简洁的演示主页和404页，集成随机抽取背景图片的案例与参数说明文档。
 
-<!--
-## 简介
-
-白嫖Github仓库和Cloudflare Workers简单快捷实现可分类的随机图片抽取
-
-（写着玩，屎山，别喷我，叠甲，叠甲，叠甲，叠甲，叠甲）
-
-希望类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)食用方法的直接看方案3,4,5
-
-**最完善的为方案5，通常也会是最新且bug最少的**
-
-## 演示
-
-[https://demo2.randomimg.sfacg.ltd](https://demo2.randomimg.sfacg.ltd)主页
-
-[https://demo2.randomimg.sfacg.ltd/api](https://demo2.randomimg.sfacg.ltd/api)
-
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg1](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg1)
-
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=8)没有对应资源返回状态码404和`404.html`
-
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=demoimg1](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&cat=demoimg1)多分类抽取
-
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=4)查看`demoimg`下的`4.jpg`
-
-[https://demo2.randomimg.sfacg.ltd/api?type=json](https://demo2.randomimg.sfacg.ltd/api?type=json)默认分类抽取并返回json
-
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=2&type=json](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&id=2&type=json)指定`demoimg`下的`2.jpg`返回json
-
-[https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&type=302](https://demo2.randomimg.sfacg.ltd/api?cat=demoimg&type=302)以302返回跳转到随机一张图的准确地址，供网页使用
-
-PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演示站是添加的自定义域名
-
 ## 部署和使用
 
-Github随便新建个公开仓库，**图片按`1.jpg，2.jpg，3.jpg`这样重命名后分类存到文件夹里**，不分文件夹就只能设置默认文件夹抽取
+1. 准备图片仓库
 
-Cloudflare Worker首页：https://workers.cloudflare.com
+	你可以使用现有的公开 GitHub 仓库，或者新建一个。
 
-注册，登陆，`start building`，取一个worker子域名，`创建服务`，保持默认的即可。
+	图片可以存放在仓库的任意目录下。
 
-进入编辑后复制 [worker.js](https://github.com/Cheshire-Nya/easy-random-img-api/blob/main/worker.js)  到左侧代码框，**按照代码中的注释和自己的需求修改代码**，`保存并部署`。
+	不再强制要求特定的文件夹结构（如 /jpg/），只需在 JSON 中填写完整路径（包含后缀）即可。
 
-### 需要修改的变量
+2. 编写图片信息文件 (image.json)
 
-#### 必选
+	创建一个 image.json 文件（放在仓库或任意可公网访问的地方）。采用扁平化键值对结构：
 
-- `urlIndex`：主页模板的地址
+	```
+	{
+	  "unique_id_01": {
+		"src": "mobile/1.jpg",
+		"category": ["anime", "mobile"],
+		"device": ["mobile"]
+	  },
+	  "unique_id_02": {
+		"src": "wallpapers/sky.png",
+		"title": "高清蓝天",
+		"repo": "scenery_repo", 
+		"category": ["scenery", "blue"],
+		"device": ["pc"]
+	  }
+	}
+	```
 
-- `url404`：404页模板的地址
+	- Key: 图片的唯一标识（ID）。
 
-- `imgHost`：图片仓库的地址，通常为此格式`https://raw.githubusercontent.com/<github用户名>/<仓库名>/<分支名>`
+	- src: 图片在仓库中的相对路径（必须包含后缀，如 .jpg, .png）。
 
-- `defaultPath`：当访问的url为`https://example.com/api`时抽取图片的文件夹，你可以当成默认分类
+	- repo: (可选) 指定该图片所在的仓库 Key（需在 Worker 代码中配置），默认使用 default。
 
-- `maxValues`：用来抽图的文件夹名称和对应的图片数，以键值对形式存储，格式为`'<名称>': <数量>`，`defaultPath`以及对应数量应写为`/<名称>: <数量>`
+	- category: (数组) 图片所属的分类标签。
 
-#### 可选
+	- device: (数组) 适配的设备类型 (mobile, pc)。
 
-- `redirectProxy`：返回类型为302时图片使用的代理，默认为`2`。
+3. 部署 Cloudflare Worker
+	访问 [Cloudflare Workers](https://workers.cloudflare.com)。
 
-   `0`不使用代理（返回github原地址）
+	创建服务 (Create Service) -> Hello World 模板。
 
-   `1`(不推荐)使用worker本身代理（返回`https://example.com/api?id=1`这样的链接）
+	复制本项目 worker.js 的全部代码到编辑器中。
 
-   ~~`2`(推荐)使用ghproxy代理（返回`ghproxy.com`代理的链接）~~ ghproxy似乎寄了，演示站现在用的是1  
+	修改顶部的配置区域（见下文）。
 
-   PS：如果302返回使用的是worker代理，那么请求一次就是请求了worker两次。那我问你🤓👆
+	保存并部署。
 
-- `ghproxyUrl`：github加速站的链接，`ghproxy.com`能正常使用就不需要改，更换地址通常按照此格式填写`"https://example.com/"`（不能漏掉结尾的`/`）
+### ⚙️ Worker 配置说明
+
+请在 worker.js 顶部修改以下变量：
+
+```
+const jsonUrl = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/image.json";
+// json文件的地址
+
+const urlIndex = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/index.html";
+// 主页模板地址
+
+const url404 = "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/html-template/404.html";
+// 404模板地址
+
+// 多仓库映射表
+// 格式: "仓库标识": "仓库Raw地址前缀"
+// 注意：地址末尾必须带 "/"
+const repoConfig = {
+    // 必须保留 default
+    "default": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/%E6%96%B9%E6%A1%885/jpg/",
+    
+    // 可选：其他仓库
+    "genshin": "https://raw.githubusercontent.com/Cheshire-Nya/random-genshin-img/main/"
+};
+
+const redirectProxy = 2;
+// 代理模式（使用场景通常是type=302）: 
+// 0 = GitHub 直链 (不推荐，国内访问慢)
+// 1 = Worker 代理 (消耗 Worker 流量及次数)
+// 2 = 第三方 CDN 代理 (使用 wsrv.nl 加速)
+```
+
+**【注意】上述url中的所有中文都需写成utf8编码形式，不然会一直给你丢到404，比如我的json地址是"/方案5/image.json"写成了"/%E6%96%B9%E6%A1%885/image.json"**
+
 
 ### 调用参数
 
 <table>
-<thead>
-  <tr>
-    <th>可用参数</th>
-    <th>值</th>
-    <th>说明</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td align="center">cat</td>
-    <td align="center">图片分类<br>（文件夹名）</td>
-    <td>在该分类中抽取图片（没有该参数时从默认文件夹抽取）</td>
-  </tr>
-  <tr>
-    <td align="center" rowspan="2">type</td>
-    <td align="center">302</td>
-    <td>通过302返回直接跳转到图片对应的准确地址，可用作随机网页背景等</td>
-  </tr>
+  <thead>
     <tr>
-    <td align="center">json</td>
-    <td>以json格式返回</td>
-  </tr>
-  <tr>
-    <td align="center">id</td>
-    <td align="center">&lt;数值&gt;</td>
-    <td>返回名称为&lt;数值&gt;的指定图片(存在id时不允许type=302)</td>
-  </tr>
-  <tr>
-    <td align="center">不使用参数</td>
-    <td align="center">空</td>
-    <td>简简单单抽张图</td>
-  </tr>
-</tbody>
+      <th width="15%">参数</th>
+      <th width="20%">值</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>JSON Key</code></td>
+      <td>指定分类。<span class="tag-tip">留空则在所有分类中随机抽取。</span></td>
+    </tr>
+    <tr>
+      <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>pc</code><br><code>mobile</code><br><code>invalid</code></td>
+      <td>
+        <strong>pc/mobile</strong>: 强制筛选特定设备。<br>
+        <strong>invalid</strong>: 全池随机模式（混合所有设备图）。<br>
+        <span class="tag-tip">留空则根据 User-Agent 自动判断。</span>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>302</code><br><code>json</code><br><code>(空)</code></td>
+      <td>
+        <strong>302</strong>: 跳转到图片真实地址 (默认)。<br>
+        <strong>json</strong>: 返回包含图片信息、CDN链接、元数据的 JSON。<br>
+        <strong>(空)</strong>: 直接返回图片二进制流。
+      </td>
+    </tr>
+    <tr>
+      <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>Integer</code> / <code>String</code></td>
+      <td>
+        <strong>数字</strong>: 获取筛选结果中的第 N 张图。<br>
+        <strong>字符串</strong>: 直接获取指定 Key 的图片 (如 <code>id=miku_01</code>)。
+      </td>
+    </tr>
+    <tr>
+      <td><strong>not_id</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>String (Key)</code></td>
+      <td>
+        传入当前图片的 Key (如 <code>keli_01</code>)。<br>
+        <span class="tag-tip">API 将确保随机出的下一张图不是这张 (用于去重)。</span>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
+      <td><code>webp</code> / <code>jpg</code></td>
+      <td>指定返回格式。系统会自动判断是否需要通过 CDN 转码。</td>
+    </tr>
+    <tr>
+      <td><strong>CDN参数</strong><br><span class="tag tag-opt">透传</span></td>
+      <td><code>w</code>, <code>h</code>, <code>q</code>...</td>
+      <td>
+        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的所有处理参数。<br>
+        例: <code>w=200</code> (宽200), <code>q=75</code> (质量75), <code>fit=cover</code>
+      </td>
+    </tr>
+  </tbody>
 </table>
-PS：
 
-- 从多个分类中抽取应按此格式`https://example.com/api?cat=value1&cat=value2`
+### 🔗 调用示例
 
-- json返回包含:分类`cat`,图片id`id`,图片github原链接`githubUrl`,worker代理链接`workerUrl`,ghproxy代理链接`proxyUrl`
+- **主页**：[https://demo5.randomimg.sfacg.ltd](https://demo5.randomimg.sfacg.ltd)
+
+- **随机获取一张图 (自动适配设备)**：[https://demo5.randomimg.sfacg.ltd/api](https://demo5.randomimg.sfacg.ltd/api)
+
+- **随机获取一张category1分类的图**：[https://demo5.randomimg.sfacg.ltd/api?cat=category1](https://demo5.randomimg.sfacg.ltd/api?cat=category1)
+
+- **获取一张 WebP 格式、质量 75 的图**：[https://demo5.randomimg.sfacg.ltd/api?form=webp&q=75](https://demo5.randomimg.sfacg.ltd/api?form=webp&q=75)category1分类webp，自动识别设备类型
+
+- **禁用设备判断，无视分类全池抽取**：[https://demo5.randomimg.sfacg.ltd/api?device=invalid](https://demo5.randomimg.sfacg.ltd/api?device=invalid)
+
+- **获取图片的详细 JSON 信息**：[https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json](https://demo5.randomimg.sfacg.ltd/api?cat=category2&type=json)随机抽取`category2`分类并返回json
+
+- **防止获取到 ID 为 miku_01 的图 (去重)：**[https://demo5.randomimg.sfacg.ltd/api?not_id=keli_01](https://demo5.randomimg.sfacg.ltd/api?not_id=keli_01)
+
+- **302跳转到随机一张图的准确地址**：[https://demo5.randomimg.sfacg.ltd/api?type=302](https://demo5.randomimg.sfacg.ltd/api?type=302)
+
+PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演示站是添加的自定义域名
+
+### 响应/错误返回说明
+- 📦 JSON 响应示例
 ```
 {
-  "category": "demoimg1",
-  "id": 2,
-  "githubUrl": "https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg1/2.jpg",
-  "workerUrl": "https://demo2.randomimg.sfacg.ltd/api?id=2&cat=demoimg1",
-  "proxyUrl": "https://ghproxy.com/https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/main/demoimg1/2.jpg"
+  "categories": ["anime", "miku"], // 图片所属分类
+  "device": "mobile",              // 图片所属设备
+  "id": 5,                         // 在当前筛选列表中的索引
+  "key": "miku_v4",                // 图片的唯一 Key (ID)
+  "repo": "default",               // 来源仓库
+  "form": "webp",
+  "githubUrl": "https://raw.githubusercontent.com/.../miku_v4.jpg",
+  "workerUrl": "https://api.site/api?cat=anime&id=miku_v4&form=webp",
+  "proxyUrl": "https://wsrv.nl/?url=...&output=webp",
+  "metadata": {                    // image.json 中定义的额外信息
+    "title": "初音未来 V4",
+    "author": "iXima"
+  }
 }
 ```
 
+- 正确响应通常会带有如下标头<br>
 
+![正确响应标头](https://wsrv.nl/?url=https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/refs/heads/main/%E4%BE%8B%E5%9B%BE/%E6%AD%A3%E7%A1%AE%E5%93%8D%E5%BA%94.png)
 
+- 错误响应通常会带有如下标头<br>
+
+![错误响应标头](https://wsrv.nl/?url=https://raw.githubusercontent.com/Cheshire-Nya/easy-random-image-api/refs/heads/main/%E4%BE%8B%E5%9B%BE/%E9%94%99%E8%AF%AF%E5%93%8D%E5%BA%94.png)<br>
+	`X-Error-Reason`有以下几种
+	
+	CDN Error: ${response.status}
+	Invalid Path
+	Invalid image format: 
+	Failed to fetch JSON config
+	Category not found
+	Category is empty
+	ID out of range
+	Invalid type parameter
+	No category specified
+	Redirect Config Error
+	404 Template not found
+
+## 🛠️ 常见问题 (FAQ)
+	
+**1.为什么返回 403 Forbidden？**
+	- 通常是因为目标图片服务（GitHub 或 CDN）拦截了请求。本项目已内置 User-Agent 伪装，但如果你在浏览器直接访问 GitHub Raw 链接也打不开，说明是网络问题或仓库私有。请确保 GitHub 仓库是 Public 的。
+
+**2.CDN 图片加载失败怎么办？**
+	- 程序内置了 自动降级 (Fallback) 机制。如果 CDN (wsrv.nl) 请求失败（403/404/500），Worker 会自动尝试直接从 GitHub 获取原始图片，并修正 Content-Type 返回给用户。
+
+**3.关于免费额度**
+	- Cloudflare Workers 免费版每天有 100,000 次 请求额度。
+
+	-本项目已针对性优化：图片资源设置了 Cache-Control: max-age=3600，CORS 预检设置了 24 小时缓存。这意味着浏览器缓存命中时不消耗 Worker 额度。
+	
 ## PS
 
 - 不知道还有啥问题，如果遇到了可以提issue
@@ -168,45 +280,3 @@ PS：
 2. cloudflare注册没有花里胡哨的各种认证，超低门槛，有邮箱就能注册。
 
 3. 理论上可以无限白嫖，多注册几个账号，其他服务调用随机图时多写个逻辑返回错误请求另外的接口即可。唯一的成本是大陆访问需要绑自定义域名，但是域名可以白嫖免费域名或者一年十几二十块的便宜域名，四舍五入就是妹花钱。添加自定义域在[Cloudflare控制台](https://dash.cloudflare.com/)中`网站`里按指引操作，选择free计划即可。
-
-4. **错误返回偷懒没完善**
-
-5. **主页和404页没啥卵用，建议用的时候删了**
-
-## TODO（咕咕咕）
-
-- [x] 1.可以查看指定图片辣
-
-- [x] 2.支持返回json力
-
-- [x] 3.添加主页模板和404模板
-
-- [x] 4.`/api?`，`/api/?`，`/api/1.jpg`，`/api/demoimg?`防呆处理
-
-- [x] 5.可以返回302到通过ghproxy或worker代理的图片地址，方便web使用不受浏览器缓存影响
-<!--
-- [x] 7.弃用旧方案改为从url查询参数中获取分类以方便实现多个分类抽取
-
-
-## 其他版本（咕咕咕）
-
-- [x] 极简简简版（留档纪念的第一版捏）
-
-- [x] 自行存入图片信息的版本（类似[YieldRay/Random-Picture](https://github.com/YieldRay/Random-Picture)）
-
-## changelog
-
-- 2023.02.11 方案3
-
-- 2023.02.10 完成TODO3
-
-- 2023.02.08 弃用旧方案，完成TODO2
-
-- 2023.02.06 完成TODO4、8，完善错误返回
-
-- 2023.02.05 完成TODO1、5、6、7
-
-- 2023.02.04 更完善的版本，自定义默认目录
-
-- 2023.02.03 初始极简版，简简单单抽个图
---!>

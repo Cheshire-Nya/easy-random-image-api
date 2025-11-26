@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '方案5/**'
+      - '/**'
       - 'wrangler.toml'
 
 jobs:
