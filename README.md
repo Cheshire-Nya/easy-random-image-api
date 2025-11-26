@@ -46,7 +46,8 @@
 
 ## 部署和使用
 
-- **快速部署**
+
+**快速部署**
 
 1.准备仓库以及资源
 
@@ -101,7 +102,8 @@
 
 	以后每次对仓库main分支修改后cloudflare都会自动重新部署代码
 
-- **传统部署**
+
+**传统部署**
 	
 1. 准备图片仓库
 
@@ -318,15 +320,18 @@ PS:cloudflare提供的`workers.dev`域名在大陆无法正常解析，所以演
 ## 🛠️ 常见问题 (FAQ)
 	
 **1.为什么返回 403 Forbidden？**
-	- 通常是因为目标图片服务（GitHub 或 CDN）拦截了请求。本项目已内置 User-Agent 伪装，但如果你在浏览器直接访问 GitHub Raw 链接也打不开，说明是网络问题或仓库私有。请确保 GitHub 仓库是 Public 的。
+	
+- 通常是因为目标图片服务（GitHub 或 CDN）拦截了请求。本项目已内置 User-Agent 伪装，但如果你在浏览器直接访问 GitHub Raw 链接也打不开，说明是网络问题或仓库私有。请确保 GitHub 仓库是 Public 的。
 
 **2.CDN 图片加载失败怎么办？**
-	- 程序内置了 自动降级 (Fallback) 机制。如果 CDN (wsrv.nl) 请求失败（403/404/500），Worker 会自动尝试直接从 GitHub 获取原始图片，并修正 Content-Type 返回给用户。
+	
+- 程序内置了 自动降级 (Fallback) 机制。如果 CDN (wsrv.nl) 请求失败（403/404/500），Worker 会自动尝试直接从 GitHub 获取原始图片，并修正 Content-Type 返回给用户。
 
 **3.关于免费额度**
-	- Cloudflare Workers 免费版每天有 100,000 次 请求额度。
+	
+- Cloudflare Workers 免费版每天有 100,000 次 请求额度。
 
-	-本项目已针对性优化：图片资源设置了 Cache-Control: max-age=3600，CORS 预检设置了 24 小时缓存。这意味着浏览器缓存命中时不消耗 Worker 额度。
+-本项目已针对性优化：图片资源设置了 Cache-Control: max-age=3600，CORS 预检设置了 24 小时缓存。这意味着浏览器缓存命中时不消耗 Worker 额度。
 	
 ## PS
 
