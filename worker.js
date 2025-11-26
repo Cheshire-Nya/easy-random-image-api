@@ -101,6 +101,33 @@ async function extractSearch(urlSearch, request) {
       selectedDevice = getDeviceType(request);
   }
 
+  if (id && isNaN(parseInt(id))) {
+      const targetItem = imgDB[id];
+      if (!targetItem) return error("Image Key not found");
+
+      let { src, repo, category, device: itemDevice, ...metaRest } = targetItem;
+      let imgPath = src;
+      let repoKey = repo || "default";
+      
+      let metaData = { 
+          id: id, 
+          category: category,
+          ...metaRest 
+      };
+
+      let mainCat = (category && category.length > 0) ? category[0] : "default";
+
+      if (type === '302') {
+        return redirect(id, imgPath, mainCat, selectedDevice, returnForm, request, searchParams, repoKey);
+      } 
+      else if (type === 'json') {
+        return typejson(id, imgPath, category, selectedDevice, returnForm, request, searchParams, metaData, repoKey);
+      } 
+      else if (!type) {
+        return image(imgPath, returnForm, mainCat, selectedDevice, searchParams, metaData, repoKey);
+      }
+  }
+
   let filteredItems = [];
   const entries = Object.entries(imgDB);
 
@@ -265,7 +292,7 @@ async function image(img, returnForm, category, device, searchParams, metaData, 
           }
       } 
       else {
-          return error(`Image Load Failed. Target: ${fallbackUrl} Status: ${response.status}`);
+          return error(`Image Load Failed`);
       }
   }
 
