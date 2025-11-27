@@ -13,6 +13,8 @@
             --text-secondary: #cbd5e0;
             --accent-color: #90cdf4;
             --tag-bg: rgba(0, 0, 0, 0.5);
+            --progress-glow: rgba(144, 205, 244, 0.6); 
+            --progress-track: rgba(144, 205, 244, 0.1);
         }
 
         body {
@@ -30,260 +32,163 @@
         }
 
         #bg-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            overflow: hidden;
-            background-color: #000;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; overflow: hidden; background-color: #000;
         }
 
         #default-gradient {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-gradient);
-            z-index: 1;
-            transition: opacity 0.8s ease-out;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); z-index: 1; transition: opacity 0.8s ease-out;
         }
 
         #glitch-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            opacity: 0; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2; opacity: 0; 
         }
 
         #static-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 3;
-            background-size: cover;
-            background-position: center;
-            opacity: 0;
-            transition: opacity 0.6s ease-in; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3; background-size: cover; background-position: center;
+            opacity: 0; transition: opacity 0.6s ease-in; 
         }
 
         .float-btn {
-            position: fixed;
-            top: 25px;
-            z-index: 100;
+            position: fixed; top: 25px; z-index: 100;
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid var(--glass-border);
-            height: 44px;
-            border-radius: 12px;
-            color: var(--text-color);
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(4px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 0;
-            outline: none;
+            height: 44px; border-radius: 12px;
+            color: var(--text-color); cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(4px); padding: 0; outline: none;
             -webkit-tap-highlight-color: transparent;
-            font-family: inherit;
-            font-weight: bold;
-            font-size: 1.2rem;
+            font-family: inherit; font-weight: bold; font-size: 1.2rem;
+            overflow: hidden;
+            
+            transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        background-color 0.3s ease,
+                        transform 0.3s ease,
+                        box-shadow 0.3s ease;
         }
 
         .float-btn:hover {
-            background: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.8);
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
         }
 
-        #ui-toggle-btn {
-            right: 25px;
-            width: 44px;
-        }
-
-        #ui-toggle-btn.is-active {
-            background: rgba(0, 0, 0, 0.6);
-        }
-
         #bg-refresh-btn {
             left: 25px;
-            min-width: 44px;
-            padding: 0;
-            transition: width 0.3s ease, background 0.3s ease;
+            width: 44px; 
+            --progress: 0%;
         }
 
-        #bg-refresh-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.9;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 0 14px;
-            width: auto;
-            font-size: 0.9rem;
-            font-family: monospace;
-            letter-spacing: 1px;
+        #bg-refresh-btn::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: var(--progress);
+            background: linear-gradient(90deg, var(--progress-track) 0%, var(--progress-glow) 100%);
+            box-shadow: 2px 0 10px var(--accent-color);
+            transition: width 0.2s linear; 
+            z-index: 0;
+            pointer-events: none;
         }
 
-        #bg-refresh-btn:hover:not(:disabled) .icon-svg {
-            transform: rotate(180deg);
+        #bg-refresh-btn.loading {
+            cursor: progress;
+            width: 100px; 
+            font-size: 0.8rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            letter-spacing: 0;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        #bg-refresh-btn:not(.loading):hover .icon-svg {
+            transform: translate(-50%, -50%) rotate(180deg);
         }
 
         .icon-svg {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
+            width: 20px; height: 20px; fill: currentColor;
             transition: transform 0.5s ease;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 1;
+        }
+        
+        #bg-refresh-btn.loading .icon-svg {
+            opacity: 0; transform: translate(-50%, -50%) scale(0.5);
         }
 
-        .hamburger {
-            position: relative;
-            width: 20px;
-            height: 16px;
+        .progress-text {
+            position: absolute; width: 100%; text-align: center;
+            opacity: 0; transition: opacity 0.2s ease;
+            z-index: 1;
+        }
+        
+        #bg-refresh-btn.loading .progress-text {
+            opacity: 1;
+            animation: pulseText 1.5s infinite ease-in-out;
         }
 
-        .hamburger span {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--text-color);
-            border-radius: 2px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: center;
+        @keyframes pulseText {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
+        #ui-toggle-btn { right: 25px; width: 44px; }
+        #ui-toggle-btn.is-active { background: rgba(0, 0, 0, 0.6); }
+
+        .hamburger { position: relative; width: 20px; height: 16px; }
+        .hamburger span { position: absolute; left: 0; width: 100%; height: 2px; background-color: var(--text-color); border-radius: 2px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
         .hamburger span:nth-child(1) { top: 0; }
         .hamburger span:nth-child(2) { top: 50%; transform: translateY(-50%); }
         .hamburger span:nth-child(3) { bottom: 0; }
-
-        #ui-toggle-btn.is-active .hamburger span:nth-child(1) {
-            top: 50%;
-            transform: translateY(-50%) rotate(45deg);
-        }
-
-        #ui-toggle-btn.is-active .hamburger span:nth-child(2) {
-            opacity: 0;
-            transform: translateX(10px);
-        }
-
-        #ui-toggle-btn.is-active .hamburger span:nth-child(3) {
-            bottom: 50%;
-            transform: translateY(50%) rotate(-45deg);
-        }
+        #ui-toggle-btn.is-active .hamburger span:nth-child(1) { top: 50%; transform: translateY(-50%) rotate(45deg); }
+        #ui-toggle-btn.is-active .hamburger span:nth-child(2) { opacity: 0; transform: translateX(10px); }
+        #ui-toggle-btn.is-active .hamburger span:nth-child(3) { bottom: 50%; transform: translateY(50%) rotate(-45deg); }
 
         .hint-toast {
-            position: fixed;
-            top: 34px;
-            z-index: 99;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            pointer-events: none;
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-            white-space: nowrap;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: fixed; top: 34px; z-index: 99;
+            background: rgba(0, 0, 0, 0.7); border: 1px solid var(--glass-border); color: #fff;
+            padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; pointer-events: none;
+            opacity: 0; transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            white-space: nowrap; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-
-        #hint-left { 
-            left: 80px;
-            transform: translateX(-20px); 
-        }
-        
-        #hint-right { 
-            right: 80px; 
-            transform: translateX(20px); 
-        }
-
-        .hint-visible {
-            opacity: 1 !important;
-            transform: translateX(0) !important;
-        }
+        #hint-left { left: 140px; transform: translateX(-20px); }
+        #hint-right { right: 80px; transform: translateX(20px); }
+        .hint-visible { opacity: 1 !important; transform: translateX(0) !important; }
 
         .container {
-            position: relative;
-            z-index: 10;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 2rem 2.5rem;
-            max-width: 900px;
-            width: 100%;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-            text-align: center;
+            position: relative; z-index: 10;
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); border-radius: 16px; padding: 2rem 2.5rem; max-width: 900px; width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); text-align: center;
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 1;
-            transform: scale(1) translateY(0);
+            opacity: 1; transform: scale(1) translateY(0);
         }
-
-        .container.hidden {
-            opacity: 0;
-            transform: scale(0.95) translateY(-20px);
-            pointer-events: none;
-        }
+        .container.hidden { opacity: 0; transform: scale(0.95) translateY(-20px); pointer-events: none; }
 
         header { margin-bottom: 1rem; }
         h1 { font-size: 2.2rem; margin: 0 0 0.5rem 0; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         p.subtitle { color: var(--text-secondary); margin: 0; font-size: 1rem; margin-bottom: 1.5rem; }
 
         .btn { 
-            display: inline-block; 
-            padding: 12px 28px; 
-            background: rgba(255,255,255,0.15); 
-            border-radius: 30px; 
-            border: 1px solid var(--glass-border); 
-            color: white; 
-            font-weight: bold; 
-            transition: all 0.3s; 
-            text-decoration: none; 
-            backdrop-filter: blur(4px);
-            font-size: 1rem;
+            display: inline-block; padding: 12px 28px; background: rgba(255,255,255,0.15); 
+            border-radius: 30px; border: 1px solid var(--glass-border); color: white; font-weight: bold; 
+            transition: all 0.3s; text-decoration: none; backdrop-filter: blur(4px); font-size: 1rem;
         }
         .btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
         .toggle-btn {
-            background: none;
-            border: none;
-            color: var(--accent-color);
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            padding: 5px 10px;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+            background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 0.9rem;
+            margin-top: 1rem; padding: 5px 10px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 5px;
         }
         .toggle-btn:hover { color: #fff; text-decoration: underline; }
 
-        #docs-section {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in-out, margin-top 0.3s;
-            margin-top: 0;
-        }
+        #docs-section { max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.5s ease-in-out, opacity 0.4s ease-in-out, margin-top 0.3s; margin-top: 0; }
         #docs-section.expanded { max-height: 800px; opacity: 1; margin-top: 2rem; }
 
-        .table-wrapper { 
-            overflow-x: auto; 
-            border-radius: 8px; 
-            background: rgba(0, 0, 0, 0.3); 
-            text-align: left;
-            border-top: 1px solid var(--glass-border);
-        }
+        .table-wrapper { overflow-x: auto; border-radius: 8px; background: rgba(0, 0, 0, 0.3); text-align: left; border-top: 1px solid var(--glass-border); }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--glass-border); }
         th { background-color: rgba(0, 0, 0, 0.4); font-weight: 600; color: var(--accent-color); white-space: nowrap; }
@@ -294,14 +199,7 @@
         .tag-tip { color: #90cdf4; font-size: 0.85em; display: block; margin-top: 4px; }
         .tag-warn { color: #fc8181; font-size: 0.85em; display: block; margin-top: 4px; }
 
-        footer { 
-            margin-top: 2rem; 
-            text-align: center; 
-            font-size: 0.8rem; 
-            color: var(--text-secondary); 
-            border-top: 1px solid transparent;
-            padding-top: 1rem;
-        }
+        footer { margin-top: 2rem; text-align: center; font-size: 0.8rem; color: var(--text-secondary); border-top: 1px solid transparent; padding-top: 1rem; }
         a { color: var(--accent-color); text-decoration: none; transition: color 0.2s; }
         a:hover { color: #fff; text-decoration: underline; }
 
@@ -381,6 +279,7 @@
         <svg class="icon-svg" viewBox="0 0 24 24">
             <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
         </svg>
+        <span class="progress-text"></span>
     </button>
 
     <button id="ui-toggle-btn" class="float-btn is-active" title="切换界面显示">
@@ -418,53 +317,39 @@
                     <tr>
                       <td><strong>cat</strong><br><span class="tag tag-opt">可选</span></td>
                       <td><code>JSON Key</code></td>
-                      <td>指定分类。<span class="tag-tip">留空则在所有分类中随机抽取。</span></td>
+                      <td>指定分类。<span class="tag-tip">留空则随机全分类。</span></td>
                     </tr>
                     <tr>
                       <td><strong>device</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>pc</code><br><code>mobile</code><br><code>invalid</code></td>
-                      <td>
-                        <strong>pc/mobile</strong>: 强制筛选特定设备。<br>
-                        <strong>invalid</strong>: 全池随机模式（混合所有设备图）。<br>
-                        <span class="tag-tip">留空则根据 User-Agent 自动判断。</span>
-                      </td>
+                      <td><code>pc/mobile</code><br><code>invalid</code></td>
+                      <td><strong>invalid</strong>: 全池随机。<span class="tag-tip">留空自动判断设备。</span></td>
                     </tr>
                     <tr>
                       <td><strong>type</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>302</code><br><code>json</code><br><code>(空)</code></td>
-                      <td>
-                        <strong>302</strong>: 跳转到图片真实地址 (默认)。<br>
-                        <strong>json</strong>: 返回包含图片信息、CDN链接、元数据的 JSON。<br>
-                        <strong>(空)</strong>: 直接返回图片二进制流。
-                      </td>
+                      <td><code>302</code><br><code>json</code></td>
+                      <td><strong>json</strong>: 返回元数据。<br><strong>(空)</strong>: 直接返回图片。</td>
                     </tr>
                     <tr>
                       <td><strong>id</strong><br><span class="tag tag-opt">可选</span></td>
                       <td><code>Integer</code> / <code>String</code></td>
-                      <td>
-                        <strong>数字</strong>: 获取筛选结果中的第 N 张图。<br>
-                        <strong>字符串</strong>: 直接获取指定 Key 的图片 (如 <code>id=miku_01</code>)。
-                      </td>
+                      <td>获取第 N 张图。<span class="tag-warn">⚠️ 建议配合 device 使用。</span></td>
                     </tr>
                     <tr>
                       <td><strong>not_id</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>String (Key)</code></td>
-                      <td>
-                        传入当前图片的 Key (如 <code>miku_01</code>)。<br>
-                        <span class="tag-tip">API 将确保随机出的下一张图不是这张 (用于去重)。</span>
-                      </td>
+                      <td><code>String</code></td>
+                      <td>指定不出现的图Key (去重)。</td>
                     </tr>
                     <tr>
                       <td><strong>form</strong><br><span class="tag tag-opt">可选</span></td>
-                      <td><code>webp</code> / <code>jpg</code></td>
-                      <td>指定返回格式。系统会自动判断是否需要通过 CDN 转码。</td>
+                      <td><code>webp/jpg</code></td>
+                      <td>指定格式 (自动转码)。</td>
                     </tr>
                     <tr>
                       <td><strong>CDN参数</strong><br><span class="tag tag-opt">透传</span></td>
                       <td><code>w</code>, <code>h</code>, <code>q</code>...</td>
                       <td>
-                        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的所有处理参数。<br>
-                        例: <code>w=200</code> (宽200), <code>q=75</code> (质量75), <code>fit=cover</code>
+                        支持 <a href="https://wsrv.nl/" target="_blank" style="color:var(--accent-color)">wsrv.nl</a> 的参数。<br>
+                        例: <code>w=200</code>, <code>q=80</code>
                       </td>
                     </tr>
                   </tbody>
@@ -494,7 +379,6 @@
 
         const uiToggleBtn = document.getElementById('ui-toggle-btn');
         const mainUI = document.getElementById('main-ui');
-        
         uiToggleBtn.addEventListener('click', () => {
             mainUI.classList.toggle('hidden');
             uiToggleBtn.classList.toggle('is-active');
@@ -504,25 +388,47 @@
         const glitchContainer = document.getElementById('glitch-container');
         const staticImageEl = document.getElementById('static-image');
         const refreshBtn = document.getElementById('bg-refresh-btn');
-        const refreshIconSVG = `<svg class="icon-svg" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>`;
+        const progressText = refreshBtn.querySelector('.progress-text');
 
         let currentImgId = null;
 
+        async function fetchImageWithProgress(url, onProgress) {
+            const response = await fetch(url);
+            const contentLength = response.headers.get('content-length');
+            const total = parseInt(contentLength, 10);
+            let loaded = 0;
+
+            const reader = response.body.getReader();
+            const chunks = [];
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                loaded += value.length;
+                
+                if (total) {
+                    onProgress(loaded / total);
+                }
+            }
+
+            const blob = new Blob(chunks);
+            return URL.createObjectURL(blob);
+        }
+
+        function updateProgressBtn(progress, text) {
+            const p = progress * 100;
+            refreshBtn.style.setProperty('--progress', `${p}%`);
+            progressText.innerText = text;
+        }
+
         async function switchBackground() {
             refreshBtn.disabled = true;
-            let timeLeft = 3;
-            refreshBtn.innerHTML = `${timeLeft}s`;
+            refreshBtn.classList.add('loading');
+            
+            updateProgressBtn(0, "0%");
 
-            const timerInterval = setInterval(() => {
-                timeLeft--;
-                if (timeLeft > 0) {
-                    refreshBtn.innerHTML = `${timeLeft}s`;
-                } else {
-                    clearInterval(timerInterval);
-                }
-            }, 1000);
-
-            const waitThreeSeconds = new Promise(resolve => setTimeout(resolve, 3000));
+            const waitTime = new Promise(resolve => setTimeout(resolve, 5000));
             
             try {
                 const screenW = Math.ceil(window.innerWidth * window.devicePixelRatio);
@@ -537,20 +443,21 @@
                 if (!res.ok) throw new Error('API Request failed');
                 const data = await res.json();
                 
-                if (data.id) {
-                    currentImgId = data.id;
+                if (data.key) {
+                    currentImgId = data.key;
                 }
 
                 const imgUrl = data.proxyUrl || data.workerUrl;
 
-                const loadImages = new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.src = imgUrl;
-                    img.onload = () => resolve(imgUrl);
-                    img.onerror = reject;
+                const imageLoadTask = fetchImageWithProgress(imgUrl, (progress) => {
+                    const percent = Math.round(progress * 100);
+                    updateProgressBtn(progress, `${percent}%`);
+                }).then(blobUrl => {
+                    updateProgressBtn(1, "即将完成");
+                    return blobUrl;
                 });
 
-                await Promise.all([waitThreeSeconds, loadImages]);
+                const [_, blobUrl] = await Promise.all([waitTime, imageLoadTask]);
 
                 glitchContainer.innerHTML = ''; 
                 const glitchWrapper = document.createElement('div');
@@ -558,7 +465,7 @@
                 for (let i = 0; i < 5; i++) {
                     const layer = document.createElement('div');
                     layer.className = 'glitch__img';
-                    layer.style.backgroundImage = `url('${imgUrl}')`;
+                    layer.style.backgroundImage = `url('${blobUrl}')`;
                     glitchWrapper.appendChild(layer);
                 }
                 glitchContainer.appendChild(glitchWrapper);
@@ -572,7 +479,7 @@
                 }
 
                 setTimeout(() => {
-                    staticImageEl.style.backgroundImage = `url('${imgUrl}')`;
+                    staticImageEl.style.backgroundImage = `url('${blobUrl}')`;
                 }, 800);
 
                 setTimeout(() => {
@@ -582,16 +489,22 @@
                 setTimeout(() => {
                     glitchContainer.style.display = 'none';
                     glitchContainer.innerHTML = '';
+                    
+                    refreshBtn.classList.remove('loading');
                     refreshBtn.disabled = false; 
-                    refreshBtn.innerHTML = refreshIconSVG;
+                    
+                    setTimeout(() => {
+                        refreshBtn.style.setProperty('--progress', '0%');
+                    }, 400);
                 }, 3000);
 
             } catch (e) {
                 console.warn('Background load failed:', e);
-                refreshBtn.innerHTML = "!";
+                progressText.innerText = "!";
                 setTimeout(() => {
+                    refreshBtn.classList.remove('loading');
                     refreshBtn.disabled = false;
-                    refreshBtn.innerHTML = refreshIconSVG;
+                    refreshBtn.style.setProperty('--progress', '0%');
                 }, 2000);
             }
         }
